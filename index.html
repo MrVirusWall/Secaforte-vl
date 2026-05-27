@@ -399,12 +399,12 @@ async function loginAs(who){
   await fetchAndRender();
 }
 function logout(){
-  currentUser=null; selForPin=null;
+  currentUser=null;
   document.getElementById('app').style.display='none';
   document.getElementById('app').classList.remove('vis');
   document.getElementById('login-screen').style.display='flex';
-  backToSelect();
 }
+window.addEventListener('DOMContentLoaded',()=>{ loginAs('xio'); });
 
 // ── FETCH ────────────────────────────────────
 async function fetchVisitas(){
