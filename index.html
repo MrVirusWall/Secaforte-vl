@@ -408,7 +408,12 @@ function logout(){
 
 // ── FETCH ────────────────────────────────────
 async function fetchVisitas(){
-  const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_TAB)}`;
+  const today = new Date();
+  const y = today.getFullYear();
+  const m = String(today.getMonth()+1).padStart(2,'0');
+  const firstDay = `${y}-${m}-01`;
+  const query = encodeURIComponent(`select * where C >= date '${firstDay}'`);
+  const url=`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_TAB)}&tq=${query}`;
   const r=await fetch(url);
   if(!r.ok) throw new Error(`HTTP ${r.status}`);
   return parseCSV(await r.text());
