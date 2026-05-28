@@ -240,7 +240,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
         <div style="font-size:22px">📋</div>
         <div>
           <div class="op-title">AGENDA DE LOS ATO — Objetivo Operativo</div>
-          <div class="op-subtitle">Visitas de PRESUPUESTO conseguidas · L–V: 7/día · Sáb: 4/día · Pendientes + Realizadas cuentan · Canceladas no cuentan</div>
+          <div class="op-subtitle">Visitas de PRESUPUESTO conseguidas · L–V: 5/día · Sáb: 3/día · Pendientes + Realizadas cuentan · Canceladas no cuentan</div>
         </div>
       </div>
       <div class="op-top">
@@ -1029,68 +1029,90 @@ async function loadKommoUsers(){
 }
 
 async function loadKommoPipeline(){
-  // Stages hardcoded from pipeline API - no need to fetch
-  Object.assign(kommoStages, PIPELINE_STAGES);
+  try{
+    const data = await kommoFetch('/api/v4/leads/pipelines');
+    const pipes = (data._embedded && data._embedded.pipelines) || [];
+    for(const pipe of pipes){
+      for(const st of (pipe._embedded && pipe._embedded.statuses)||[]){
+        if(!st.is_trashed) kommoStages[st.id] = {name:st.name, color:st.color||'#94a3b8', pipe:pipe.name};
+      }
+    }
+  }catch(e){console.warn('Kommo pipeline error:',e);}
 }
 
 // Trae conteos por etapa usando paginación eficiente:
 // Solo trae id + status_id + responsible_user_id de cada lead (campos mínimos)
 // Filtra activos (excluye ganados=142 y perdidos=143) del usuario
-// Etapas activas del pipeline Pirka Stone (hardcoded para eficiencia)
-const PIPELINE_STAGES = {
-  45872138: {name: "Leads Entrantes", color: "#c1c1c1"},
-  65602768: {name: "LLAME YA!", color: "#99ccff"},
-  51188315: {name: "Asignacion", color: "#99ccff"},
-  62924980: {name: "Recapturado", color: "#99ccff"},
-  82046652: {name: "Promo Financiamiento", color: "#99ccff"},
-  46934573: {name: "N/C", color: "#99ccff"},
-  56188196: {name: "Parqueo", color: "#99ccff"},
-  61543384: {name: "Visita Sin Ubicacion", color: "#99ccff"},
-  45872144: {name: "Visita", color: "#ffff99"},
-  45872147: {name: "Presupuestado", color: "#ffcc66"},
-  49378025: {name: "Señado", color: "#99ccff"},
-  62605568: {name: "Coord. Instalacion", color: "#ff8f92"},
-  62605416: {name: "VENDIDOS", color: "#deff81"}
-};
-const ACTIVE_STATUS_IDS = [45872138, 65602768, 51188315, 62924980, 82046652, 46934573, 56188196, 61543384, 45872144, 45872147, 49378025, 62605568, 62605416];
-
-// Fetch conteos por etapa: hace 1 request por etapa (13 requests livianos)
-// Mucho más eficiente que paginar 20k leads
 async function fetchKommoStageCounts(userId){
+  // Usa filter[status]=active para traer SOLO leads activos (no ganados/perdidos)
+  // Kommo soporta filter[status]=active como shortcut para excluir cerrados
   const stageCounts = {};
-  // Para cada etapa activa, hace 1 request con limit=1 para obtener _total_items
-  await Promise.all(ACTIVE_STATUS_IDS.map(async function(statusId){
+  let page = 1;
+  const PER_PAGE = 250;
+  while(true){
     try{
-      const url = '/api/v4/leads?limit=1' +
-        '&filter[responsible_user_id][0]=' + userId +
-        '&filter[statuses][0][pipeline_id]=5111495' +
-        '&filter[statuses][0][status_id]=' + statusId;
+      // filter[responsible_user_id][0] = formato correcto confirmado
+      // Excluimos closed stages usando filter[statuses] con los IDs del pipeline
+      // Pipeline Pirka Stone id=5111495
+      // No filtramos por pipeline para ver todos los activos del usuario
+      const url = '/api/v4/leads?limit='+PER_PAGE+'&page='+page+
+        '&filter[responsible_user_id][0]='+userId+
+        '&filter[pipeline_id][0]=5111495'; // solo Pipeline Pirka Stone
       const data = await kommoFetch(url);
-      const total = data._total_items || (data._embedded && data._embedded.leads && data._embedded.leads.length) || 0;
-      if(total > 0) stageCounts[statusId] = total;
-    }catch(e){ /* etapa vacía, ignorar */ }
-  }));
+      const leads = (data._embedded && data._embedded.leads) || [];
+      for(const l of leads){
+        // Kommo status 142=ganado, 143=perdido (etapas de cierre globales)
+        // También excluir los que tienen closed_at (ya cerrados)
+        if(l.status_id === 142 || l.status_id === 143) continue;
+        if(l.closed_at && l.closed_at > 0) continue;
+        const sid = l.status_id;
+        stageCounts[sid] = (stageCounts[sid]||0) + 1;
+      }
+      if(leads.length < PER_PAGE) break;
+      page++;
+      if(page > 150) break;
+    }catch(e){
+      console.warn('Kommo fetch error page '+page, e);
+      break;
+    }
+  }
   return stageCounts;
 }
 
-// Fallback: mismo método sin filtro de pipeline
+// Fallback sin filtro de pipeline
 async function fetchKommoStageCountsNoPipe(userId){
-  return {}; // no needed with new approach
+  const stageCounts = {};
+  let page = 1;
+  while(true){
+    try{
+      const url = '/api/v4/leads?limit=250&page='+page+
+        '&filter[responsible_user_id][0]='+userId;
+      const data = await kommoFetch(url);
+      const leads = (data._embedded && data._embedded.leads) || [];
+      for(const l of leads){
+        if(l.status_id === 142 || l.status_id === 143) continue;
+        if(l.closed_at && l.closed_at > 0) continue;
+        stageCounts[l.status_id] = (stageCounts[l.status_id]||0) + 1;
+      }
+      if(leads.length < 250) break;
+      page++;
+      if(page > 150) break;
+    }catch(e){ break; }
+  }
+  return stageCounts;
 }
 
 function stageCountsToArray(stageCounts){
-  // Return in pipeline order (not by count) so embudo is visible top to bottom
-  return ACTIVE_STATUS_IDS
-    .filter(function(sid){ return stageCounts[sid] > 0; })
-    .map(function(sid){
-      const st = PIPELINE_STAGES[sid] || {};
-      return {
-        id: sid,
-        name: st.name || ('Etapa '+sid),
-        color: st.color || '#94a3b8',
-        count: stageCounts[sid]
-      };
-    });
+  return Object.entries(stageCounts).map(function(e){
+    const sid = parseInt(e[0]);
+    return {
+      id: sid,
+      name: (kommoStages[sid] && kommoStages[sid].name) || 'Etapa '+sid,
+      color: (kommoStages[sid] && kommoStages[sid].color) || '#94a3b8',
+      count: e[1]
+    };
+  }).filter(function(s){ return s.count > 0; })
+    .sort(function(a,b){ return b.count - a.count; });
 }
 
 async function renderKommo(){
