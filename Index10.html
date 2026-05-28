@@ -1054,15 +1054,29 @@ const PIPELINE_STAGES = {
 };
 const ACTIVE_STATUS_IDS = [45872138, 65602768, 51188315, 62924980, 82046652, 46934573, 56188196, 61543384, 45872144, 45872147, 49378025, 62605568, 62605416];
 
-// Lee conteos desde Google Sheet (actualizado por Apps Script cada hora)
-// SHEET_ID_KOMMO = ID del Google Sheet donde Apps Script escribe los datos
-const SHEET_ID_KOMMO = '1yO9i127JcAflbDLARe9c6c1dJDT1ac3loWethRP_lHw';
-
+// Fetch conteos por etapa: hace 1 request por etapa (13 requests livianos)
+// Mucho más eficiente que paginar 20k leads
 async function fetchKommoStageCounts(userId){
-  // No se usa - los datos vienen del Sheet
-  return {};
+  const stageCounts = {};
+  // Para cada etapa activa, hace 1 request con limit=1 para obtener _total_items
+  await Promise.all(ACTIVE_STATUS_IDS.map(async function(statusId){
+    try{
+      const url = '/api/v4/leads?limit=1' +
+        '&filter[responsible_user_id][0]=' + userId +
+        '&filter[statuses][0][pipeline_id]=5111495' +
+        '&filter[statuses][0][status_id]=' + statusId;
+      const data = await kommoFetch(url);
+      const total = data._total_items || (data._embedded && data._embedded.leads && data._embedded.leads.length) || 0;
+      if(total > 0) stageCounts[statusId] = total;
+    }catch(e){ /* etapa vacía, ignorar */ }
+  }));
+  return stageCounts;
 }
-async function fetchKommoStageCountsNoPipe(userId){ return {}; }
+
+// Fallback: mismo método sin filtro de pipeline
+async function fetchKommoStageCountsNoPipe(userId){
+  return {}; // no needed with new approach
+}
 
 function stageCountsToArray(stageCounts){
   // Return in pipeline order (not by count) so embudo is visible top to bottom
@@ -1082,48 +1096,48 @@ function stageCountsToArray(stageCounts){
 async function renderKommo(){
   const grid = document.getElementById('kommo-grid');
   if(!grid) return;
-  if(SHEET_ID_KOMMO === 'REEMPLAZAR_CON_ID_DEL_SHEET'){
-    grid.innerHTML = '<div style="padding:16px;color:#94a3b8;font-size:12px;text-align:center">⏳ Pendiente configuración — seguí las instrucciones del script</div>';
-    return;
-  }
-  grid.innerHTML = '<div class="kommo-loading">Cargando pipeline...</div>';
+  grid.innerHTML = '<div class="kommo-loading">Cargando pipeline de Kommo...</div>';
   try{
-    const url = 'https://docs.google.com/spreadsheets/d/'+SHEET_ID_KOMMO+'/gviz/tq?tqx=out:csv&sheet=KommoPipeline';
-    const r = await fetch(url);
-    if(!r.ok) throw new Error('HTTP '+r.status);
-    const csv = await r.text();
-    const lines = csv.trim().split('\n');
-    if(lines.length < 2){ grid.innerHTML='<div class="kommo-error">Sin datos — esperá que el script corra por primera vez</div>'; return; }
-    const rows = lines.slice(1).map(function(l){
-      const v=l.split(',').map(function(s){return s.replace(/^"|"$/g,'').trim();});
-      return {name:v[0],xio:parseInt(v[1])||0,lc:parseInt(v[2])||0};
-    }).filter(function(r){return r.name&&r.name!=='Sin datos';});
-    const lastUpdate=(lines[1].split(',')[4]||'').replace(/^"|"$/g,'');
-    const vlsToShow=currentProfile==='admin'?['xio','lc']:[currentProfile];
-    let html='';
+    await Promise.all([loadKommoUsers(), loadKommoPipeline()]);
+    const vlsToShow = currentProfile==='admin'?['xio','lc']:[currentProfile];
+    let html = '';
     for(const vl of vlsToShow){
-      const color=vl==='xio'?'var(--xio)':'var(--lc)';
-      const field=vl==='xio'?'xio':'lc';
-      const total=rows.reduce(function(a,r){return a+r[field];},0);
-      let stageRows=rows.filter(function(r){return r[field]>0;}).map(function(r){
-        const pct=total>0?Math.round(r[field]/total*100):0;
+      const uid = kommoUserIds[vl];
+      if(!uid){
+        html += '<div class="kommo-vl"><div class="kommo-vl-title" style="color:'+(vl==='xio'?'var(--xio)':'var(--lc)')+'">'+VL_NAMES[vl]+'</div><div class="kommo-error">Usuario no encontrado en Kommo</div></div>';
+        continue;
+      }
+      // Fetch stage counts efficiently
+      let stageCounts = await fetchKommoStageCounts(uid);
+      const total_active = Object.values(stageCounts).reduce(function(a,b){return a+b;},0);
+      // If 0 results, try without pipeline filter
+      if(total_active === 0) stageCounts = await fetchKommoStageCountsNoPipe(uid);
+      const stages = stageCountsToArray(stageCounts);
+      const total = stages.reduce(function(a,s){return a+s.count;},0);
+      const color = vl==='xio'?'var(--xio)':'var(--lc)';
+      let rows = stages.map(function(st){
+        const pct = total>0?Math.round(st.count/total*100):0;
         return '<div class="stage-row">'+
           '<div class="stage-bar-wrap"><div class="stage-bar-fill" style="width:'+pct+'%;background:'+color+'"></div></div>'+
-          '<div class="stage-name">'+r.name+'</div>'+
-          '<div class="stage-count" style="color:'+color+'">'+r[field]+'</div>'+
+          '<div class="stage-name">'+st.name+'</div>'+
+          '<div class="stage-count" style="color:'+color+'">'+st.count+'</div>'+
         '</div>';
       }).join('');
-      if(!stageRows) stageRows='<div class="kommo-error">Sin leads activos</div>';
-      html+='<div class="kommo-vl">'+
+      if(!rows) rows='<div class="kommo-error">Sin leads activos</div>';
+      html += '<div class="kommo-vl">'+
         '<div class="kommo-vl-title" style="color:'+color+'">'+VL_NAMES[vl]+' — '+total+' leads activos</div>'+
-        (lastUpdate?'<div style="font-size:10px;color:#94a3b8;margin-bottom:8px">Actualizado: '+lastUpdate+'</div>':'')+
-        '<div class="pipeline-stages">'+stageRows+'</div>'+
+        '<div class="pipeline-stages">'+rows+'</div>'+
       '</div>';
     }
-    grid.style.gridTemplateColumns=currentProfile!=='admin'?'1fr':'1fr 1fr';
-    grid.innerHTML=html;
+    // Si es VL solo hay 1 card, expandirla
+    if(currentProfile!=='admin'){
+      grid.style.gridTemplateColumns='1fr';
+    } else {
+      grid.style.gridTemplateColumns='1fr 1fr';
+    }
+    grid.innerHTML = html;
   }catch(e){
-    grid.innerHTML='<div class="kommo-error">Error: '+e.message+'</div>';
+    grid.innerHTML = '<div class="kommo-error">Error cargando Kommo: '+e.message+'</div>';
   }
 }
 
