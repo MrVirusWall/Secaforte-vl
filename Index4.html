@@ -205,7 +205,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
       <button class="btn" id="sw-btn" onclick="switchUser()">Ver Luis Carlos</button>
       <button class="btn" id="rf-btn" onclick="refreshData()">↻ Actualizar</button>
       <div class="ubadge" id="ubadge"></div>
-      <button class="btn" id="logout-btn" onclick="doLogout()" style="display:none;color:#dc2626;border-color:#fecaca;">Salir</button>
     </div>
   </div>
   <div class="dbar">
@@ -384,51 +383,7 @@ const DIAS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'
 const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const DNAMES=['Lun','Mar','Mié','Jue','Vie','Sáb'];
 
-// ── PINS (cambiar antes de distribuir) ──
-const PINS={xio:'200120',lc:'304401',admin:'399300'};
-let cu='xio', lastS=null, currentProfile=null; // profile: 'xio','lc','admin'
-
-// ── LOGIN ──
-function selectProfile(profile){
-  document.getElementById('login-step1').style.display='none';
-  const step2=document.getElementById('login-step2');
-  step2.style.display='flex';
-  const labels={xio:'PIN de Xiomara',lc:'PIN de Luis Carlos',admin:'PIN de Administrador'};
-  document.getElementById('pin-label').textContent=labels[profile];
-  const inp=document.getElementById('pin-input');
-  inp.value='';
-  document.getElementById('pin-error').style.display='none';
-  inp.style.borderColor=profile==='xio'?'#0099cc':profile==='lc'?'#e05a1a':'#94a3b8';
-  inp.focus();
-  window._pendingProfile=profile;
-}
-function backToStep1(){
-  document.getElementById('login-step2').style.display='none';
-  document.getElementById('login-step1').style.display='block';
-  document.getElementById('pin-input').value='';
-  window._pendingProfile=null;
-}
-function checkPin(){
-  const v=document.getElementById('pin-input').value;
-  const p=window._pendingProfile;
-  if(v.length===4){
-    if(v===PINS[p]){
-      currentProfile=p;
-      cu=p==='admin'?'xio':p; // admin empieza viendo xio pero puede cambiar
-      document.getElementById('login-screen').style.display='none';
-      fetchAndRender();
-    } else {
-      document.getElementById('pin-error').style.display='block';
-      document.getElementById('pin-input').value='';
-    }
-  } else {
-    document.getElementById('pin-error').style.display='none';
-  }
-}
-document.addEventListener('DOMContentLoaded',function(){
-  document.getElementById('pin-input').addEventListener('keydown',function(e){if(e.key==='Enter')checkPin();});
-  // No auto-login: mostrar pantalla de login
-});
+let cu='xio', lastS=null;
 
 function getDIM(){const t=new Date();return new Date(t.getFullYear(),t.getMonth()+1,0).getDate();}
 function getW(){return WBS[getDIM()]||WBS[30];}
@@ -576,54 +531,7 @@ function analyze(rows){
 }
 
 function cRate(s){return s.ag>=3?s.ca/s.ag:null;}
-function calcBonus(s){
-  // Racha consecutiva: solo cobras el bono de la semana si llegaste Y la semana anterior también.
-  // Si cortás la racha, la próxima semana que llegás vuelve a 200.
-  // Escala: 1ra consecutiva=200, 2da=400, 3ra=500, 4ta=800
-  const SCALE=[200,400,500,800];
-  const W=getW();
-  const wi=getWi();
-  let earned=0;
-  let streak=0; // cuántas semanas consecutivas llevas llegando
-  for(let i=0;i<=wi;i++){
-    const llego=(s.wRe[i]||0)>=BON_W;
-    if(llego){
-      const bonIdx=Math.min(streak,SCALE.length-1);
-      earned+=SCALE[bonIdx];
-      streak++;
-    } else {
-      streak=0; // se corta la racha
-    }
-  }
-  return earned;
-}
-
-function getBonusDetails(s){
-  // Retorna detalle semana a semana para mostrar en UI
-  const SCALE=[200,400,500,800];
-  const W=getW();
-  const wi=getWi();
-  const details=[];
-  let streak=0;
-  for(let i=0;i<W.length;i++){
-    const llego=(s.wRe[i]||0)>=BON_W;
-    const show=i<=wi;
-    let bonVal=0;
-    if(show){
-      if(llego){
-        bonVal=SCALE[Math.min(streak,SCALE.length-1)];
-        streak++;
-      } else {
-        streak=0;
-      }
-    } else {
-      // semana futura: mostrar qué cobraría si llega
-      bonVal=SCALE[Math.min(streak,SCALE.length-1)];
-    }
-    details.push({week:W[i],llego,show,bonVal,streak:streak});
-  }
-  return details;
-}
+function calcBonus(s){const W=getW();const wi=getWi();let e=0;for(let i=0;i<=wi;i++){if((s.wRe[i]||0)>=BON_W)e+=W[i].b;}return e;}
 
 // ── RENDER ────────────────────────────────────────────────────────────────────
 function renderAll(S){
@@ -635,21 +543,9 @@ function renderAll(S){
 
 function renderHeader(){
   const b=document.getElementById('ubadge');
-  // Badge muestra el perfil logueado, no el que se está viendo
-  const profileLabel=currentProfile==='admin'?'Admin':VL_NAMES[currentProfile||cu];
-  const profileColor=currentProfile==='lc'?'lc':(currentProfile==='admin'?'admin':currentProfile||'xio');
-  b.className='ubadge '+(currentProfile==='admin'?'xio':currentProfile||cu);
-  b.textContent='👤 '+profileLabel+(currentProfile==='admin'?' (Admin)':'');
-  // Switch solo para admin
-  const swBtn=document.getElementById('sw-btn');
-  if(currentProfile==='admin'){
-    swBtn.style.display='';
-    swBtn.textContent='Ver '+(cu==='xio'?'Luis Carlos':'Xiomara');
-  } else {
-    swBtn.style.display='none';
-  }
-  // Botón logout
-  document.getElementById('logout-btn').style.display='';
+  b.className='ubadge '+cu;
+  b.textContent='👤 '+VL_NAMES[cu];
+  document.getElementById('sw-btn').textContent='Ver '+(cu==='xio'?'Luis Carlos':'Xiomara');
 }
 
 function renderDateBar(){
@@ -732,10 +628,6 @@ function renderOperativo(S){
 
   // Desglose semanal ambos VL
   ['xio','lc'].forEach(function(vl){
-    const semRow=document.getElementById('sem-'+vl);
-    if(currentProfile!=='admin'&&currentProfile!==vl){
-      semRow.style.display='none'; return;
-    } else { semRow.style.display=''; }
     const sv=S[vl];
     const pct=OP_WEEK>0?Math.min(sv.semCons/OP_WEEK*100,100):0;
     const color=vl==='xio'?'var(--xio)':'var(--lc)';
@@ -759,69 +651,28 @@ function renderComision(S){
   document.getElementById('cm-flt').textContent=flt>0?flt:'✓ Llegaste!';
   document.getElementById('cm-rate').textContent=rate!==null?(rate*100).toFixed(1)+'%':'—';
   document.getElementById('cm-bon').textContent='Bs '+bon;
-  // Explicar racha actual
-  const details=getBonusDetails(s);
-  const wi2=getWi();
-  let streak=0;
-  for(let i=0;i<wi2;i++){if((s.wRe[i]||0)>=BON_W)streak++;else streak=0;}
-  const nextScale=[200,400,500,800];
-  const nextBon=nextScale[Math.min(streak,nextScale.length-1)];
-  const streakMsg=streak>0?'Racha de '+streak+' sem · próx: Bs '+nextBon:'Sin racha · si llegás esta sem: Bs 200';
-  document.getElementById('cm-bon-s').textContent=bon>0?streakMsg:'Completá 20 realizadas · Bs 200 primera sem';
+  document.getElementById('cm-bon-s').textContent=bon>0?'Semanas completadas · máx Bs 2,000':'Completá semanas de 20 realizadas';
 
-  // Calcular detalles de racha - VL solo ven los suyos en las cards semana
-  const xioDetails=getBonusDetails(S.xio);
-  const lcDetails=getBonusDetails(S.lc);
-  const meDetails=cu==='xio'?xioDetails:lcDetails;
-  const showBothVL=currentProfile==='admin';
-
-  document.getElementById('com-weeks').innerHTML=xioDetails.map(function(xd,i){
-    const ld=lcDetails[i];
-    const xW=S.xio.wRe[i]||0, lW=S.lc.wRe[i]||0;
-    const meOk=cu==='xio'?xd.llego:ld.llego;
-    const meBon=cu==='xio'?xd.bonVal:ld.bonVal;
+  document.getElementById('com-weeks').innerHTML=W.map(function(w,i){
+    const xW=S.xio.wRe[i]||0,lW=S.lc.wRe[i]||0;
+    const show=i<=wi;
+    const xOk=xW>=BON_W,lOk=lW>=BON_W;
+    const meOk=cu==='xio'?xOk:lOk;
     let cls='cw';
-    if(i===wi) cls+=' cur';
-    else if(i<wi) cls+=meOk?' pok':' pfail';
+    if(i===wi)cls+=' cur';
+    else if(i<wi)cls+=meOk?' pok':' pfail';
     const ck='<span style="color:var(--green);font-size:11px;margin-left:2px">✓</span>';
     const xk='<span style="color:var(--red);font-size:11px;margin-left:2px">✗</span>';
-    // Bono que cobra cada uno si llega (según racha)
-    const xBonTxt=xd.show?(xd.llego?'+Bs '+xd.bonVal:'Bs 0'):'Bs '+xd.bonVal+' si llega';
-    const lBonTxt=ld.show?(ld.llego?'+Bs '+ld.bonVal:'Bs 0'):'Bs '+ld.bonVal+' si llega';
     return '<div class="'+cls+'">'+
-      '<div class="cw-l">'+xd.week.l+' · '+xd.week.r+'</div>'+
-      '<div class="cw-b">🎁 '+(i<wi?(meOk?'Cobrado Bs '+meBon:'No cobrado'):(i===wi?'En juego Bs '+meBon:'Próximo Bs '+meBon))+'</div>'+
-      (showBothVL||currentProfile==='xio'?
-        '<div class="cw-row"><div class="cw-dot" style="background:var(--xio)"></div>'+
-        '<div class="cw-name" style="color:var(--xio)">Xiomara</div>'+
-        '<div class="cw-val" style="color:var(--xio)">'+xW+'/'+BON_W+'</div>'+
-        (xd.show?(xd.llego?ck:xk):'')+
-        '<span style="font-size:9px;color:var(--text-dim);margin-left:4px">'+xBonTxt+'</span>'+
-      '</div>':'')+
-      (showBothVL||currentProfile==='lc'?
-        '<div class="cw-row"><div class="cw-dot" style="background:var(--lc)"></div>'+
-        '<div class="cw-name" style="color:var(--lc)">Luis Carlos</div>'+
-        '<div class="cw-val" style="color:var(--lc)">'+lW+'/'+BON_W+'</div>'+
-        (ld.show?(ld.llego?ck:xk):'')+
-        '<span style="font-size:9px;color:var(--text-dim);margin-left:4px">'+lBonTxt+'</span>'+
-      '</div>':'')+
+      '<div class="cw-l">'+w.l+' · '+w.r+'</div>'+
+      '<div class="cw-b">🎁 Bs '+w.b+'</div>'+
+      '<div class="cw-row"><div class="cw-dot" style="background:var(--xio)"></div><div class="cw-name" style="color:var(--xio)">Xiomara</div><div class="cw-val" style="color:var(--xio)">'+xW+'</div><div class="cw-tgt">/'+BON_W+'</div>'+(show?(xOk?ck:xk):'')+' </div>'+
+      '<div class="cw-row"><div class="cw-dot" style="background:var(--lc)"></div><div class="cw-name" style="color:var(--lc)">Luis Carlos</div><div class="cw-val" style="color:var(--lc)">'+lW+'</div><div class="cw-tgt">/'+BON_W+'</div>'+(show?(lOk?ck:xk):'')+' </div>'+
     '</div>';
   }).join('');
 }
 
 function renderCards(S){
-  // VL solo ven su propia card; admin ve ambas
-  if(currentProfile!=='admin'){
-    const other=currentProfile==='xio'?'lc':'xio';
-    document.getElementById('card-'+other).style.display='none';
-    document.getElementById('card-'+currentProfile).style.display='';
-    document.querySelector('.vs-c').style.display='none';
-  } else {
-    document.getElementById('card-xio').style.display='';
-    document.getElementById('card-lc').style.display='';
-    const vsc=document.querySelector('.vs-c');
-    if(vsc)vsc.style.display='';
-  }
   for(const vl of['xio','lc']){
     const s=S[vl];
     const opPct=Math.min(s.cons/OP_MONTH*100,100);
@@ -857,16 +708,6 @@ function renderTodayDetail(S){
     xio:{cons:'hx-cons',re:'hx-re',ca:'hx-ca',list:'hl-xio'},
     lc: {cons:'hl2-cons',re:'hl2-re',ca:'hl2-ca',list:'hl-lc'}
   };
-  // VL solo ven su card de hoy
-  const hoyXio=document.getElementById('hl-xio').closest('.hc');
-  const hoyLc=document.getElementById('hl-lc').closest('.hc');
-  if(currentProfile!=='admin'){
-    if(hoyXio)hoyXio.style.display=currentProfile==='xio'?'':'none';
-    if(hoyLc)hoyLc.style.display=currentProfile==='lc'?'':'none';
-  } else {
-    if(hoyXio)hoyXio.style.display='';
-    if(hoyLc)hoyLc.style.display='';
-  }
   for(const vl of['xio','lc']){
     const s=S[vl];const ids=data[vl];
     document.getElementById(ids.cons).textContent=s.consH;
@@ -883,17 +724,6 @@ function renderTodayDetail(S){
 }
 
 function renderLeads(S){
-  // Rankings solo para admin
-  const leadsSection=document.querySelector('.lg');
-  const leadTitle=leadsSection?leadsSection.previousElementSibling:null;
-  if(currentProfile!=='admin'){
-    if(leadsSection)leadsSection.style.display='none';
-    if(leadTitle)leadTitle.style.display='none';
-    return;
-  } else {
-    if(leadsSection)leadsSection.style.display='';
-    if(leadTitle)leadTitle.style.display='';
-  }
   const u=[
     {n:'Xiomara',    c:'var(--xio)',cons:S.xio.cons,re:S.xio.re},
     {n:'Luis Carlos',c:'var(--lc)', cons:S.lc.cons, re:S.lc.re}
@@ -914,11 +744,7 @@ function renderLeads(S){
   }).join('');
 }
 
-function switchUser(){
-  if(currentProfile!=='admin')return; // solo admin puede cambiar vista
-  cu=cu==='xio'?'lc':'xio';
-  if(lastS)renderAll(lastS);
-}
+function switchUser(){cu=cu==='xio'?'lc':'xio';if(lastS)renderAll(lastS);}
 
 async function fetchV(){
   const t=new Date(),y=t.getFullYear(),m=String(t.getMonth()+1).padStart(2,'0');
@@ -957,56 +783,7 @@ function showL(v){document.getElementById('lo').classList.toggle('h',!v);documen
 function showErr(m){document.getElementById('err-m').textContent=m;document.getElementById('err-b').classList.add('v');}
 function hideErr(){document.getElementById('err-b').classList.remove('v');}
 function toast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type+' show';setTimeout(function(){t.classList.remove('show');},3000);}
-function doLogout(){
-  currentProfile=null; cu='xio'; lastS=null;
-  document.getElementById('app').classList.remove('v');
-  document.getElementById('login-screen').style.display='flex';
-  document.getElementById('login-step2').style.display='none';
-  document.getElementById('login-step1').style.display='block';
-  document.getElementById('pin-input').value='';
-  window._pendingProfile=null;
-}
-window.addEventListener('DOMContentLoaded',function(){
-  // No auto-login, esperar que el usuario elija perfil
-  document.getElementById('app').style.display='block'; // lo manejamos con class v
-  document.getElementById('pin-input').addEventListener('keydown',function(e){if(e.key==='Enter')checkPin();});
-});
+window.addEventListener('DOMContentLoaded',function(){fetchAndRender();});
 </script>
-
-<!-- LOGIN SCREEN -->
-<div id="login-screen" style="position:fixed;inset:0;z-index:300;background:#f0f2f7;display:flex;align-items:center;justify-content:center;">
-  <div style="background:#fff;border:1px solid #e2e6ef;border-radius:16px;padding:44px 36px;width:320px;display:flex;flex-direction:column;gap:18px;box-shadow:0 8px 40px rgba(0,0,0,0.10);">
-    <div style="text-align:center;">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:24px;font-weight:900;letter-spacing:3px;color:#1e293b;">SECAFORTE</div>
-      <div style="font-size:10px;letter-spacing:4px;text-transform:uppercase;color:#94a3b8;margin-top:3px;">Arena VL</div>
-    </div>
-    <div id="login-step1">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#94a3b8;text-align:center;margin-bottom:12px;">Seleccioná tu usuario</div>
-      <div style="display:flex;flex-direction:column;gap:9px;">
-        <button onclick="selectProfile('xio')" style="padding:12px 16px;border-radius:10px;border:1.5px solid #0099cc;background:rgba(0,153,204,0.08);color:#0099cc;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .2s;">
-          <div style="width:28px;height:28px;border-radius:50%;background:rgba(0,153,204,0.15);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;">X</div>
-          Xiomara <span style="margin-left:auto;font-size:10px;opacity:0.5;letter-spacing:2px;">VL</span>
-        </button>
-        <button onclick="selectProfile('lc')" style="padding:12px 16px;border-radius:10px;border:1.5px solid #e05a1a;background:rgba(224,90,26,0.08);color:#e05a1a;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .2s;">
-          <div style="width:28px;height:28px;border-radius:50%;background:rgba(224,90,26,0.15);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;">LC</div>
-          Luis Carlos <span style="margin-left:auto;font-size:10px;opacity:0.5;letter-spacing:2px;">VL</span>
-        </button>
-        <button onclick="selectProfile('admin')" style="padding:12px 16px;border-radius:10px;border:1.5px solid #e2e6ef;background:#f7f8fc;color:#64748b;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .2s;">
-          <div style="width:28px;height:28px;border-radius:50%;background:#e2e6ef;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;">A</div>
-          Admin <span style="margin-left:auto;font-size:10px;opacity:0.5;letter-spacing:2px;">GERENCIA</span>
-        </button>
-      </div>
-    </div>
-    <div id="login-step2" style="display:none;flex-direction:column;gap:10px;">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#94a3b8;text-align:center;" id="pin-label">PIN de acceso</div>
-      <input type="password" id="pin-input" maxlength="6" placeholder="••••" inputmode="numeric"
-        style="background:#f7f8fc;border:1px solid #e2e6ef;border-radius:8px;padding:12px 14px;color:#1e293b;font-family:'Barlow Condensed',sans-serif;font-size:22px;letter-spacing:10px;width:100%;outline:none;text-align:center;"
-        oninput="checkPin()" />
-      <div id="pin-error" style="font-size:11px;color:#dc2626;text-align:center;display:none;">PIN incorrecto. Intentá de nuevo.</div>
-      <button onclick="backToStep1()" style="background:none;border:none;color:#94a3b8;font-size:11px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;font-family:'Barlow',sans-serif;">← Volver</button>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>
