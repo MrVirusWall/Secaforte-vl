@@ -1040,79 +1040,33 @@ async function loadKommoPipeline(){
   }catch(e){console.warn('Kommo pipeline error:',e);}
 }
 
-// Trae conteos por etapa usando paginación eficiente:
-// Solo trae id + status_id + responsible_user_id de cada lead (campos mínimos)
-// Filtra activos (excluye ganados=142 y perdidos=143) del usuario
-async function fetchKommoStageCounts(userId){
-  // Usa filter[status]=active para traer SOLO leads activos (no ganados/perdidos)
-  // Kommo soporta filter[status]=active como shortcut para excluir cerrados
-  const stageCounts = {};
-  let page = 1;
-  const PER_PAGE = 250;
-  while(true){
+async function fetchKommoLeads(userId){
+  // Trae leads activos asignados a este usuario
+  let page=1, all=[];
+  while(page<=5){
     try{
-      // filter[responsible_user_id][0] = formato correcto confirmado
-      // Excluimos closed stages usando filter[statuses] con los IDs del pipeline
-      // Pipeline Pirka Stone id=5111495
-      // No filtramos por pipeline para ver todos los activos del usuario
-      const url = '/api/v4/leads?limit='+PER_PAGE+'&page='+page+
-        '&filter[responsible_user_id][0]='+userId+
-        '&filter[pipeline_id][0]=5111495'; // solo Pipeline Pirka Stone
-      const data = await kommoFetch(url);
+      const data = await kommoFetch('/api/v4/leads?limit=250&page='+page+'&filter[responsible_user_id][]='+userId+'&filter[statuses][0][pipeline_id]=0');
       const leads = (data._embedded && data._embedded.leads) || [];
-      for(const l of leads){
-        // Kommo status 142=ganado, 143=perdido (etapas de cierre globales)
-        // También excluir los que tienen closed_at (ya cerrados)
-        if(l.status_id === 142 || l.status_id === 143) continue;
-        if(l.closed_at && l.closed_at > 0) continue;
-        const sid = l.status_id;
-        stageCounts[sid] = (stageCounts[sid]||0) + 1;
-      }
-      if(leads.length < PER_PAGE) break;
-      page++;
-      if(page > 150) break;
-    }catch(e){
-      console.warn('Kommo fetch error page '+page, e);
-      break;
-    }
-  }
-  return stageCounts;
-}
-
-// Fallback sin filtro de pipeline
-async function fetchKommoStageCountsNoPipe(userId){
-  const stageCounts = {};
-  let page = 1;
-  while(true){
-    try{
-      const url = '/api/v4/leads?limit=250&page='+page+
-        '&filter[responsible_user_id][0]='+userId;
-      const data = await kommoFetch(url);
-      const leads = (data._embedded && data._embedded.leads) || [];
-      for(const l of leads){
-        if(l.status_id === 142 || l.status_id === 143) continue;
-        if(l.closed_at && l.closed_at > 0) continue;
-        stageCounts[l.status_id] = (stageCounts[l.status_id]||0) + 1;
-      }
+      if(!leads.length) break;
+      all = all.concat(leads);
       if(leads.length < 250) break;
       page++;
-      if(page > 150) break;
-    }catch(e){ break; }
+    }catch(e){break;}
   }
-  return stageCounts;
+  return all;
 }
 
-function stageCountsToArray(stageCounts){
-  return Object.entries(stageCounts).map(function(e){
-    const sid = parseInt(e[0]);
-    return {
-      id: sid,
-      name: (kommoStages[sid] && kommoStages[sid].name) || 'Etapa '+sid,
-      color: (kommoStages[sid] && kommoStages[sid].color) || '#94a3b8',
-      count: e[1]
-    };
-  }).filter(function(s){ return s.count > 0; })
-    .sort(function(a,b){ return b.count - a.count; });
+function groupByStage(leads){
+  const stages = {};
+  for(const lead of leads){
+    const sid = lead.status_id;
+    const sname = (kommoStages[sid] && kommoStages[sid].name) || 'Sin etapa';
+    const scolor = (kommoStages[sid] && kommoStages[sid].color) || '#94a3b8';
+    if(!stages[sid]) stages[sid] = {name:sname, color:scolor, count:0};
+    stages[sid].count++;
+  }
+  // Ordenar por count desc
+  return Object.values(stages).sort(function(a,b){return b.count-a.count;});
 }
 
 async function renderKommo(){
@@ -1129,13 +1083,9 @@ async function renderKommo(){
         html += '<div class="kommo-vl"><div class="kommo-vl-title" style="color:'+(vl==='xio'?'var(--xio)':'var(--lc)')+'">'+VL_NAMES[vl]+'</div><div class="kommo-error">Usuario no encontrado en Kommo</div></div>';
         continue;
       }
-      // Fetch stage counts efficiently
-      let stageCounts = await fetchKommoStageCounts(uid);
-      const total_active = Object.values(stageCounts).reduce(function(a,b){return a+b;},0);
-      // If 0 results, try without pipeline filter
-      if(total_active === 0) stageCounts = await fetchKommoStageCountsNoPipe(uid);
-      const stages = stageCountsToArray(stageCounts);
-      const total = stages.reduce(function(a,s){return a+s.count;},0);
+      const leads = await fetchKommoLeads(uid);
+      const stages = groupByStage(leads);
+      const total = leads.length;
       const color = vl==='xio'?'var(--xio)':'var(--lc)';
       let rows = stages.map(function(st){
         const pct = total>0?Math.round(st.count/total*100):0;
