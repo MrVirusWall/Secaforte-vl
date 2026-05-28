@@ -1023,9 +1023,14 @@ async function kommoFetch(path){
 }
 
 async function loadKommoUsers(){
-  // IDs fijos obtenidos de /api/v4/users
-  kommoUserIds.xio = 8479184; // Xiomara - pirkavlocal@gmail.com
-  kommoUserIds.lc  = 7533869; // Luis Carlos - kommo@pirkastone.com.bo
+  try{
+    const data = await kommoFetch('/api/v4/users?limit=50');
+    const users = (data._embedded && data._embedded.users) || [];
+    for(const u of users){
+      if(u.email === KOMMO_VL_EMAILS.xio) kommoUserIds.xio = u.id;
+      if(u.email === KOMMO_VL_EMAILS.lc)  kommoUserIds.lc  = u.id;
+    }
+  }catch(e){console.warn('Kommo users error:',e);}
 }
 
 async function loadKommoPipeline(){
