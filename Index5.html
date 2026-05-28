@@ -385,7 +385,7 @@ const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','
 const DNAMES=['Lun','Mar','Mié','Jue','Vie','Sáb'];
 
 // ── PINS (cambiar antes de distribuir) ──
-const PINS={xio:'9346',lc:'8765',admin:'3993'};
+const PINS={xio:'200120',lc:'304401',admin:'399300'};
 let cu='xio', lastS=null, currentProfile=null; // profile: 'xio','lc','admin'
 
 // ── LOGIN ──
@@ -999,7 +999,7 @@ window.addEventListener('DOMContentLoaded',function(){
     </div>
     <div id="login-step2" style="display:none;flex-direction:column;gap:10px;">
       <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#94a3b8;text-align:center;" id="pin-label">PIN de acceso</div>
-      <input type="password" id="pin-input" maxlength="4" placeholder="••••" inputmode="numeric"
+      <input type="password" id="pin-input" maxlength="6" placeholder="••••" inputmode="numeric"
         style="background:#f7f8fc;border:1px solid #e2e6ef;border-radius:8px;padding:12px 14px;color:#1e293b;font-family:'Barlow Condensed',sans-serif;font-size:22px;letter-spacing:10px;width:100%;outline:none;text-align:center;"
         oninput="checkPin()" />
       <div id="pin-error" style="font-size:11px;color:#dc2626;text-align:center;display:none;">PIN incorrecto. Intentá de nuevo.</div>
