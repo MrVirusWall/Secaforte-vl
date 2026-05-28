@@ -194,25 +194,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
   .lg,.hg{grid-template-columns:1fr;}.main{padding:12px 14px;}
   .sem-row{grid-template-columns:90px 1fr 60px 60px 60px;}
 }
-
-/* KOMMO PIPELINE */
-.kommo-block{background:#fff;border:1.5px solid #e2e6ef;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:0 1px 3px rgba(0,0,0,0.06),0 4px 12px rgba(0,0,0,0.04);}
-.kommo-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
-.kommo-title{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:900;letter-spacing:1px;color:#7c3aed;}
-.kommo-subtitle{font-size:11px;color:#64748b;margin-top:2px;}
-.kommo-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.kommo-vl{background:#f7f8fc;border:1px solid #e2e6ef;border-radius:12px;padding:14px;}
-.kommo-vl-title{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;}
-.pipeline-stages{display:flex;flex-direction:column;gap:5px;}
-.stage-row{display:flex;align-items:center;gap:8px;padding:7px 10px;background:#fff;border:1px solid #e2e6ef;border-radius:7px;}
-.stage-name{flex:1;font-size:12px;font-weight:500;color:#1e293b;}
-.stage-count{font-family:'Barlow Condensed',sans-serif;font-size:18px;font-weight:800;min-width:32px;text-align:right;}
-.stage-bar-wrap{width:60px;background:#e2e6ef;border-radius:99px;height:5px;overflow:hidden;flex-shrink:0;}
-.stage-bar-fill{height:100%;border-radius:99px;}
-.kommo-loading{text-align:center;padding:20px;color:#94a3b8;font-size:12px;letter-spacing:2px;text-transform:uppercase;}
-.kommo-error{text-align:center;padding:14px;color:#dc2626;font-size:11px;background:#fef2f2;border-radius:8px;}
-@media(max-width:768px){.kommo-grid{grid-template-columns:1fr;}}
-
 </style>
 </head>
 <body>
@@ -245,14 +226,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
       </div>
       <div class="op-top">
         <div class="oc hi" id="oc-hoy">
-          <div class="oc-l">Objetivo HOY (ajustado)</div>
+          <div class="oc-l">Conseguir HOY</div>
           <div class="oc-v" id="op-hoy-v">—</div>
           <div class="oc-s" id="op-hoy-s">—</div>
         </div>
-        <div class="oc" id="oc-mtd">
-          <div class="oc-l">MTD — Objetivo vs Real</div>
-          <div class="oc-v" id="op-mtd-v">—</div>
-          <div class="oc-s" id="op-mtd-s">—</div>
+        <div class="oc" id="oc-aj">
+          <div class="oc-l">Ajustado por caída</div>
+          <div class="oc-v" id="op-aj-v">—</div>
+          <div class="oc-s" id="op-aj-s">—</div>
         </div>
         <div class="oc">
           <div class="oc-l">Conseguidas esta semana</div>
@@ -267,7 +248,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
         <div class="oc">
           <div class="oc-l">Conseguidas este mes</div>
           <div class="oc-v" id="op-mes-cons">—</div>
-          <div class="oc-s" id="op-mes-cons-s">de 112 objetivo</div>
+          <div class="oc-s">de 112 objetivo</div>
         </div>
       </div>
 
@@ -374,22 +355,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
           <div class="hst"><div class="hst-l">Canceladas hoy</div><div class="hst-v" style="color:var(--red)" id="hl2-ca">0</div></div>
         </div>
         <div class="hl" id="hl-lc"></div>
-      </div>
-    </div>
-
-
-    <!-- KOMMO PIPELINE -->
-    <div class="stitle ani d4">Pipeline de Kommo — Leads activos</div>
-    <div class="kommo-block ani d4">
-      <div class="kommo-header">
-        <div style="font-size:22px">🔗</div>
-        <div>
-          <div class="kommo-title">PIPELINE KOMMO</div>
-          <div class="kommo-subtitle">Leads activos por etapa del embudo · Actualizado en vivo</div>
-        </div>
-      </div>
-      <div class="kommo-grid" id="kommo-grid">
-        <div class="kommo-loading">Cargando pipeline...</div>
       </div>
     </div>
 
@@ -707,48 +672,17 @@ function renderOperativo(S){
   const ajHoy=rate!==null&&baseHoy>0?Math.ceil(baseHoy/(1-rate)):baseHoy;
   const consHoy=s.consH;
 
-  // ── Card 1: Objetivo HOY ajustado por caída (este es el número real) ──
   if(dow===0){
     document.getElementById('op-hoy-v').textContent='—';
     document.getElementById('op-hoy-s').textContent='Domingo — descanso';
-    document.getElementById('oc-hoy').className='oc hi';
+    document.getElementById('oc-aj').className='oc';
   } else {
-    document.getElementById('op-hoy-v').textContent=ajHoy;
-    const llevaTxt=consHoy>=ajHoy?'✓ Ya llegaste ('+consHoy+')':'Llevas '+consHoy+' · base: '+baseHoy;
-    document.getElementById('op-hoy-s').textContent=llevaTxt;
-    document.getElementById('oc-hoy').className='oc hi'+(consHoy>=ajHoy?' good':'');
+    document.getElementById('op-hoy-v').textContent=baseHoy;
+    document.getElementById('op-hoy-s').textContent=consHoy>=baseHoy?'✓ Ya tenés '+consHoy:'Llevas '+consHoy+' hoy';
+    document.getElementById('op-aj-v').textContent=ajHoy;
+    document.getElementById('op-aj-s').textContent=rate!==null?'tasa caída: '+(rate*100).toFixed(0)+'%':'sin datos aún';
+    document.getElementById('oc-aj').className='oc '+(rate!==null&&rate>0.15?'warn':'good');
   }
-
-  // ── Card 2: MTD — Objetivo acumulado hasta hoy vs real conseguido ──
-  // Días hábiles transcurridos en el mes hasta HOY (incluyendo hoy)
-  const firstOfMonth=new Date(today.getFullYear(),today.getMonth(),1);
-  let diasHabilesHasta=0, objAcumHasta=0;
-  const cursor=new Date(firstOfMonth);
-  while(cursor<=today){
-    const cd=cursor.getDay();
-    if(cd>=1&&cd<=5){diasHabilesHasta++;objAcumHasta+=ajHoy;}      // L-V
-    else if(cd===6){diasHabilesHasta++;objAcumHasta+=Math.ceil(OP_SAB/(1-Math.max(rate||0,0)));}  // Sáb ajustado
-    cursor.setDate(cursor.getDate()+1);
-  }
-  const mtdDiff=s.cons-objAcumHasta;
-  const mtdPct=objAcumHasta>0?Math.round(s.cons/objAcumHasta*100):0;
-  const mtdCard=document.getElementById('oc-mtd');
-  document.getElementById('op-mtd-v').textContent=mtdPct+'%';
-  let mtdSub='';
-  if(mtdDiff>=0){
-    mtdSub='+'+mtdDiff+' sobre obj ('+objAcumHasta+')';
-    mtdCard.className='oc good';
-  } else {
-    mtdSub=mtdDiff+' bajo obj ('+objAcumHasta+')';
-    mtdCard.className='oc warn';
-  }
-  if(dow===0) mtdCard.className='oc';
-  document.getElementById('op-mtd-s').textContent=mtdSub;
-
-  // Card 5: % cumplimiento mensual
-  const mesPct=Math.round(s.cons/OP_MONTH*100);
-  document.getElementById('op-mes-cons').textContent=s.cons;
-  document.getElementById('op-mes-cons-s').textContent=mesPct+'% de 112 objetivo';
 
   // SEMANA
   const semCons=s.semCons;
@@ -949,35 +883,34 @@ function renderTodayDetail(S){
 }
 
 function renderLeads(S){
-  // Rankings visibles para todos (pero VL solo ven su posición, sin ver datos del rival)
+  // Rankings solo para admin
   const leadsSection=document.querySelector('.lg');
   const leadTitle=leadsSection?leadsSection.previousElementSibling:null;
-  if(leadsSection)leadsSection.style.display='';
-  if(leadTitle)leadTitle.style.display='';
+  if(currentProfile!=='admin'){
+    if(leadsSection)leadsSection.style.display='none';
+    if(leadTitle)leadTitle.style.display='none';
+    return;
+  } else {
+    if(leadsSection)leadsSection.style.display='';
+    if(leadTitle)leadTitle.style.display='';
+  }
   const u=[
-    {n:'Xiomara',    key:'xio', c:'var(--xio)',cons:S.xio.cons,re:S.xio.re},
-    {n:'Luis Carlos',key:'lc',  c:'var(--lc)', cons:S.lc.cons, re:S.lc.re}
+    {n:'Xiomara',    c:'var(--xio)',cons:S.xio.cons,re:S.xio.re},
+    {n:'Luis Carlos',c:'var(--lc)', cons:S.lc.cons, re:S.lc.re}
   ];
   const byCons=[...u].sort(function(a,b){return b.cons-a.cons;});
   const byRe=[...u].sort(function(a,b){return b.re-a.re;});
   document.getElementById('lv').innerHTML=byCons.map(function(u,i){
-    // VL solo ven su número exacto; del rival solo ven si va adelante/atrás
-    const isMe=(currentProfile==='admin')||(u.key===currentProfile);
-    const valStr=isMe?u.cons:(i===0&&u.key!==currentProfile?'<span style="font-size:13px;color:var(--muted)">adelante</span>':'<span style="font-size:13px;color:var(--muted)">atrás</span>');
-    const subStr=isMe?((u.cons/OP_MONTH)*100).toFixed(1)+'% operativo':'—';
     return '<div class="lr"><div class="lpos'+(i===0?' f':'')+'">'+( i===0?'🥇':'🥈')+'</div>'+
     '<div class="lnc"><div class="lname" style="color:'+u.c+'">'+u.n+'</div>'+
-    '<div class="lsub">'+subStr+'</div></div>'+
-    '<div class="lval" style="color:'+u.c+'">'+valStr+'</div></div>';
+    '<div class="lsub">'+((u.cons/OP_MONTH)*100).toFixed(1)+'% operativo</div></div>'+
+    '<div class="lval" style="color:'+u.c+'">'+u.cons+'</div></div>';
   }).join('');
   document.getElementById('lre').innerHTML=byRe.map(function(u,i){
-    const isMe=(currentProfile==='admin')||(u.key===currentProfile);
-    const valStr=isMe?u.re:(i===0&&u.key!==currentProfile?'<span style="font-size:13px;color:var(--muted)">adelante</span>':'<span style="font-size:13px;color:var(--muted)">atrás</span>');
-    const subStr=isMe?((u.re/BON_GOAL)*100).toFixed(1)+'% del bono':'—';
     return '<div class="lr"><div class="lpos'+(i===0?' f':'')+'">'+( i===0?'🥇':'🥈')+'</div>'+
     '<div class="lnc"><div class="lname" style="color:'+u.c+'">'+u.n+'</div>'+
-    '<div class="lsub">'+subStr+'</div></div>'+
-    '<div class="lval" style="color:'+u.c+'">'+valStr+'</div></div>';
+    '<div class="lsub">'+((u.re/BON_GOAL)*100).toFixed(1)+'% del bono</div></div>'+
+    '<div class="lval" style="color:'+u.c+'">'+u.re+'</div></div>';
   }).join('');
 }
 
@@ -1001,131 +934,12 @@ function parseCSV(csv){
 }
 function sl(l){const r=[];let c='',q=false;for(const ch of l){if(ch==='"'){q=!q;}else if(ch===','&&!q){r.push(c);c='';}else c+=ch;}r.push(c);return r;}
 
-
-// ── KOMMO CONFIG ──────────────────────────────────────────────────────────────
-const KOMMO_DOMAIN = 'pirkastonebol.kommo.com';
-const KOMMO_TOKEN  = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjQzYzlhNGUzYjgzM2IyOTk1ZmJhMmI5MDViYjIxN2Y3OTI3MDRiNTRjZWZkZjUxZWRmN2M4YTJjMzkxNWMwMGMwZTIyMDEyMzZkNTVmOTVhIn0.eyJhdWQiOiIwMTZmYWI2NS0zODA1LTQxZmEtYTI0Ny05MDFmMjJkMzk4OWUiLCJqdGkiOiI0M2M5YTRlM2I4MzNiMjk5NWZiYTJiOTA1YmIyMTdmNzkyNzA0YjU0Y2VmZGY1MWVkZjdjOGEyYzM5MTVjMDBjMGUyMjAxMjM2ZDU1Zjk1YSIsImlhdCI6MTc3OTU1MjM0NiwibmJmIjoxNzc5NTUyMzQ2LCJleHAiOjE4NjE4MzM2MDAsInN1YiI6IjM3NjUyNTEiLCJncmFudF90eXBlIjoiIiwiYWNjb3VudF9pZCI6Mjk5ODQxMjYsImJhc2VfZG9tYWluIjoia29tbW8uY29tIiwidmVyc2lvbiI6Miwic2NvcGVzIjpbInB1c2hfbm90aWZpY2F0aW9ucyIsImZpbGVzIiwiY3JtIiwiZmlsZXNfZGVsZXRlIiwibm90aWZpY2F0aW9ucyJdLCJoYXNoX3V1aWQiOiIyY2RlNzdmNS0zOWNmLTQ2M2ItOThlZi1jM2Q5M2E5MDMzOWEiLCJhcGlfZG9tYWluIjoiYXBpLWcua29tbW8uY29tIn0.fzAskdXBiHB0_9zZjaQbFFOpPXOjs0xgAWRU6expR-IQTkk5QQRQNpaqr2X9x-4erlsBBC5u5CkI2rpBLgHqjeMumEfKZgMGbGD2LbLlqbQoZ4qkid7iE5Rmw1iHA74wKHVQSjmPDt7WoE6YsbtfPORJkU4YBlH3WR56rHPDlffzZOmpBY-bissOeFyS7RNnkiWm08bcxvC0fFGM7g3PZzrXlETeFC5-PxH3sAfS_4yy8cXYjow6CI4RnB58AkcENq5srYXfP7oxz1hf96yXmG6lNqDv2lJgsvHii6L7kFGauyJUbz2fMKII_JKg_RZ_s8qIGdqQZ5wYTJq7U-hC4A';
-// IDs de usuario Kommo por VL (user_id del token = 3765251 es admin)
-// Xiomara = US0002 email pirkavlocal@gmail.com
-// Luis Carlos = US0003 email info@pirkastone.com.bo
-// Necesitamos mapear email → kommo user_id via /api/v4/users
-const KOMMO_VL_EMAILS = {xio:'pirkavlocal@gmail.com', lc:'info@pirkastone.com.bo'};
-let kommoUserIds = {xio:null, lc:null};
-let kommoStages  = {}; // id → name
-let kommoLoaded  = false;
-
-async function kommoFetch(path){
-  const r = await fetch('https://'+KOMMO_DOMAIN+path, {
-    headers:{'Authorization':'Bearer '+KOMMO_TOKEN}
-  });
-  if(!r.ok) throw new Error('Kommo '+r.status);
-  return r.json();
-}
-
-async function loadKommoUsers(){
-  try{
-    const data = await kommoFetch('/api/v4/users?limit=50');
-    const users = (data._embedded && data._embedded.users) || [];
-    for(const u of users){
-      if(u.email === KOMMO_VL_EMAILS.xio) kommoUserIds.xio = u.id;
-      if(u.email === KOMMO_VL_EMAILS.lc)  kommoUserIds.lc  = u.id;
-    }
-  }catch(e){console.warn('Kommo users error:',e);}
-}
-
-async function loadKommoPipeline(){
-  try{
-    const data = await kommoFetch('/api/v4/leads/pipelines');
-    const pipes = (data._embedded && data._embedded.pipelines) || [];
-    for(const pipe of pipes){
-      for(const st of (pipe._embedded && pipe._embedded.statuses)||[]){
-        if(!st.is_trashed) kommoStages[st.id] = {name:st.name, color:st.color||'#94a3b8', pipe:pipe.name};
-      }
-    }
-  }catch(e){console.warn('Kommo pipeline error:',e);}
-}
-
-async function fetchKommoLeads(userId){
-  // Trae leads activos asignados a este usuario
-  let page=1, all=[];
-  while(page<=5){
-    try{
-      const data = await kommoFetch('/api/v4/leads?limit=250&page='+page+'&filter[responsible_user_id][]='+userId+'&filter[statuses][0][pipeline_id]=0');
-      const leads = (data._embedded && data._embedded.leads) || [];
-      if(!leads.length) break;
-      all = all.concat(leads);
-      if(leads.length < 250) break;
-      page++;
-    }catch(e){break;}
-  }
-  return all;
-}
-
-function groupByStage(leads){
-  const stages = {};
-  for(const lead of leads){
-    const sid = lead.status_id;
-    const sname = (kommoStages[sid] && kommoStages[sid].name) || 'Sin etapa';
-    const scolor = (kommoStages[sid] && kommoStages[sid].color) || '#94a3b8';
-    if(!stages[sid]) stages[sid] = {name:sname, color:scolor, count:0};
-    stages[sid].count++;
-  }
-  // Ordenar por count desc
-  return Object.values(stages).sort(function(a,b){return b.count-a.count;});
-}
-
-async function renderKommo(){
-  const grid = document.getElementById('kommo-grid');
-  if(!grid) return;
-  grid.innerHTML = '<div class="kommo-loading">Cargando pipeline de Kommo...</div>';
-  try{
-    await Promise.all([loadKommoUsers(), loadKommoPipeline()]);
-    const vlsToShow = currentProfile==='admin'?['xio','lc']:[currentProfile];
-    let html = '';
-    for(const vl of vlsToShow){
-      const uid = kommoUserIds[vl];
-      if(!uid){
-        html += '<div class="kommo-vl"><div class="kommo-vl-title" style="color:'+(vl==='xio'?'var(--xio)':'var(--lc)')+'">'+VL_NAMES[vl]+'</div><div class="kommo-error">Usuario no encontrado en Kommo</div></div>';
-        continue;
-      }
-      const leads = await fetchKommoLeads(uid);
-      const stages = groupByStage(leads);
-      const total = leads.length;
-      const color = vl==='xio'?'var(--xio)':'var(--lc)';
-      let rows = stages.map(function(st){
-        const pct = total>0?Math.round(st.count/total*100):0;
-        return '<div class="stage-row">'+
-          '<div class="stage-bar-wrap"><div class="stage-bar-fill" style="width:'+pct+'%;background:'+color+'"></div></div>'+
-          '<div class="stage-name">'+st.name+'</div>'+
-          '<div class="stage-count" style="color:'+color+'">'+st.count+'</div>'+
-        '</div>';
-      }).join('');
-      if(!rows) rows='<div class="kommo-error">Sin leads activos</div>';
-      html += '<div class="kommo-vl">'+
-        '<div class="kommo-vl-title" style="color:'+color+'">'+VL_NAMES[vl]+' — '+total+' leads activos</div>'+
-        '<div class="pipeline-stages">'+rows+'</div>'+
-      '</div>';
-    }
-    // Si es VL solo hay 1 card, expandirla
-    if(currentProfile!=='admin'){
-      grid.style.gridTemplateColumns='1fr';
-    } else {
-      grid.style.gridTemplateColumns='1fr 1fr';
-    }
-    grid.innerHTML = html;
-  }catch(e){
-    grid.innerHTML = '<div class="kommo-error">Error cargando Kommo: '+e.message+'</div>';
-  }
-}
-
-
 async function fetchAndRender(){
   showL(true);hideErr();
   try{
     const rows=await fetchV();
     renderAll(analyze(rows));
     toast('✓ Datos actualizados','ok');
-    renderKommo();
   }catch(e){
     console.error(e);
     showErr('Error cargando datos: '+e.message);
