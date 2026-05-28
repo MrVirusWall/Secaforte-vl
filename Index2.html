@@ -436,99 +436,51 @@ function analyze(rows){
   const today=new Date();
   const W=getW();
   const weekDays=getWeekDays();
-  // Estado obj:
-  //   ag    = todas las visitas Presupuesto del mes (agendadas)
-  //   ca    = canceladas (no cuentan)
-  //   re    = realizadas (para comisión y operativo realizado)
-  //   pe    = pendientes
-  //   cons  = CONSEGUIDAS: Presupuesto, no Cancelada → cuenta para objetivo operativo (por FechaCreacion)
-  //   dayConsDIA = conseguidas por día (FechaCreacion, no Cancelada) → semana operativa
-  //   dayRe[dia] = realizadas por día → para verificar resultado
-  //   wRe[i]     = realizadas por semana comisión
-  //   wCons[i]   = conseguidas por semana comisión (no canceladas)
-  //   agH / consH / reH / caH = hoy (FechaCreacion = hoy)
-  const e=()=>({re:0,ag:0,ca:0,pe:0,cons:0,agH:0,consH:0,reH:0,caH:0,wRe:[0,0,0,0],wCons:[0,0,0,0],todayL:[],dayConsMap:{},dayReMap:{}});
+  const e=()=>({re:0,ag:0,ca:0,pe:0,agH:0,reH:0,caH:0,wRe:[0,0,0,0],todayL:[],dayRe:{}});
   const S={xio:e(),lc:e()};
 
   for(const row of rows){
-    // Identificar VL: primero Creador_Visita, fallback Modificador_Visita
-    const vlCreador=rvl(row['Creador_Visita']);
-    const vlMod=rvl(row['Modificador_Visita']);
-    const vl=vlCreador||vlMod;
-    if(!vl)continue;
-
+    const vl=rvl(row['Creador_Visita']);if(!vl)continue;
     const est=(row['Estado_Visita']||'').toLowerCase().trim();
     const mot=(row['Motivo_Visita']||'').toLowerCase().trim();
     const fc=pd(row['FechaCreacion_Visita']);
     const fv=pdt(row['FechaHora_Visita']);
     const s=S[vl];
-    const isCancelada=est==='cancelada';
-    const isRealizada=est==='realizada';
 
-    // ── Solo Presupuesto del mes en curso ──
     if(mot==='presupuesto'&&sm(fc,today)){
       s.ag++;
-      if(isCancelada)     s.ca++;
-      else if(isRealizada){s.re++; s.pe=s.pe;}  // no suma a pendientes
-      else                 s.pe++;
-
-      // CONSEGUIDA = agendada y NO cancelada (puede ser pendiente o realizada)
-      if(!isCancelada){
-        s.cons++;
+      if(est==='realizada'){
+        s.re++;
+        // por día de creación para semana operativa
         if(fc){
-          // mapa por día para bloque operativo semanal
           const dk=fc.toDateString();
-          s.dayConsMap[dk]=(s.dayConsMap[dk]||0)+1;
-          // semana de comisión (para bonus, cuenta solo realizadas)
-          const d=fc.getDate();
-          const wi=W.findIndex(w=>d>=w.d[0]&&d<=w.d[1]);
-          if(wi>=0){
-            s.wCons[wi]++;
-          }
+          s.dayRe[dk]=(s.dayRe[dk]||0)+1;
         }
       }
+      else if(est==='cancelada')s.ca++;
+      else s.pe++;
 
-      // realizadas por semana comisión (separado)
-      if(fc&&isRealizada){
-        const d=fc.getDate();
-        const wi=W.findIndex(w=>d>=w.d[0]&&d<=w.d[1]);
-        if(wi>=0) s.wRe[wi]++;
-        const dk=fc.toDateString();
-        s.dayReMap[dk]=(s.dayReMap[dk]||0)+1;
-      }
+      // semanas de comisión
+      if(fc){const d=fc.getDate();const wi=W.findIndex(w=>d>=w.d[0]&&d<=w.d[1]);if(wi>=0&&est==='realizada')s.wRe[wi]++;}
     }
 
-    // ── Hoy (FechaCreacion = hoy) ─ cualquier motivo para el conteo del día ──
-    if(sd(fc,today)&&mot==='presupuesto'){
-      s.agH++;
-      if(!isCancelada) s.consH++;
-      if(isRealizada)  s.reH++;
-      if(isCancelada)  s.caH++;
-    }
-
-    // ── Visitas programadas para hoy (FechaHora = hoy) ──
-    if(sd(fv,today)) s.todayL.push({h:fv,m:row['Motivo_Visita']||'—',e:est});
+    if(sd(fc,today)){s.agH++;if(est==='realizada')s.reH++;if(est==='cancelada')s.caH++;}
+    if(sd(fv,today))s.todayL.push({h:fv,m:row['Motivo_Visita']||'—',e:est});
   }
   for(const vl of['xio','lc'])S[vl].todayL.sort((a,b)=>(a.h||0)-(b.h||0));
   return S;
 }
 
-// Tasa cancelación = canceladas / agendadas
 function cRate(s){return s.ag>=3?s.ca/s.ag:null;}
-
-// Bono comisión: cuenta semanas donde realizadas >= BON_W_GOAL
 function calcBonus(s){const W=getW();const wi=getWi();let e=0;for(let i=0;i<=wi;i++){if((s.wRe[i]||0)>=BON_W_GOAL)e+=W[i].b;}return e;}
 
-// Conseguidas esta semana (operativo: FechaCreacion en días L-S de esta semana, no canceladas)
-function weeklyConseguidas(s){
+// Realizadas esta semana (operativo)
+function weeklyRe(s){
   const days=getWeekDays();
   let total=0;
-  for(const d of days){total+=(s.dayConsMap[d.toDateString()]||0);}
+  for(const d of days){const k=d.toDateString();total+=(s.dayRe[k]||0);}
   return total;
 }
-
-// Conseguidas hoy para el bloque operativo
-function todayConseguidas(s){return s.consH;}
 
 // ── RENDER ─────────────────────────────────────────────
 function renderAll(S){
@@ -555,91 +507,66 @@ function renderDateBar(){
 function renderOperativo(S){
   const s=S[cu];
   const today=new Date();
-  const dow=today.getDay(); // 0=Dom,1=Lun...6=Sáb
-
+  const dow=today.getDay();
   const rate=cRate(s);
 
-  // ── Objetivo HOY ──
-  const baseHoy=dailyTarget(dow); // 5 L-V, 3 Sáb, 0 Dom
-  const ajHoy=rate!==null&&baseHoy>0?Math.ceil(baseHoy/(1-rate)):baseHoy;
-  const consHoy=todayConseguidas(s); // conseguidas hoy (no canceladas)
+  // Objetivo base hoy
+  const baseHoy=dailyTarget(dow);
 
-  // ── Semana operativa ──
-  const semCons=weeklyConseguidas(s);       // conseguidas esta semana (no canceladas)
-  const semFlt=Math.max(0,OP_WEEK-semCons);
+  // Objetivo ajustado por caída
+  const ajHoy = rate!==null && baseHoy>0 ? Math.ceil(baseHoy/(1-rate)) : baseHoy;
 
+  // Realizadas esta semana
+  const semRe=weeklyRe(s);
+  const semFlt=Math.max(0,OP_WEEK-semRe);
+
+  // Días hábiles restantes en la semana (sin contar hoy si es domingo)
   const weekDays=getWeekDays();
-  const remDays=weekDays.filter(d=>{
-    const dd=new Date(d); dd.setHours(23,59,59);
-    return dd>today&&isWorkday(d.getDay());
-  });
+  const todayStr=today.toDateString();
+  const remDays=weekDays.filter(d=>d>today&&isWorkday(d.getDay()));
   const ritmoSem=remDays.length>0?Math.ceil(semFlt/remDays.length):semFlt;
 
-  // ── Render cards ──
-  // Card 1: Conseguir HOY
-  if(dow===0){
-    document.getElementById('op-hoy').textContent='—';
-    document.getElementById('op-hoy').parentElement.querySelector('.oc-sub').textContent='Domingo — descanso';
-  } else {
-    document.getElementById('op-hoy').textContent=baseHoy;
-    document.getElementById('op-hoy').parentElement.querySelector('.oc-sub').textContent=
-      consHoy>=baseHoy?`✓ Ya tenés ${consHoy}`:`Llevas ${consHoy} hoy`;
-  }
+  document.getElementById('op-hoy').textContent=dow===0?'—':baseHoy;
+  document.getElementById('op-hoy-aj').textContent=dow===0?'—':(ajHoy>baseHoy?ajHoy:`${ajHoy} ✓`);
+  document.getElementById('op-sem-re').textContent=semRe;
+  document.getElementById('op-mes-re').textContent=s.re;
 
-  // Card 2: Ajustado por caída
-  const ajCard=document.getElementById('op-hoy-card2');
-  if(dow===0){
-    document.getElementById('op-hoy-aj').textContent='—';
-    ajCard.className='op-card';
-  } else {
-    document.getElementById('op-hoy-aj').textContent=ajHoy;
-    ajCard.className=rate!==null&&rate>0.15?'op-card warn':'op-card good';
-    ajCard.querySelector('.oc-sub').textContent=rate!==null?`tasa caída: ${(rate*100).toFixed(0)}%`:'sin datos aún';
-  }
-
-  // Card 3: Van esta semana
-  document.getElementById('op-sem-re').textContent=semCons;
-  document.getElementById('op-sem-obj').textContent=OP_WEEK;
-
-  // Card 4: Faltan esta semana
   const fltEl=document.getElementById('op-sem-flt');
   const subEl=document.getElementById('op-sem-sub');
   const cardEl=document.getElementById('op-sem-card');
   if(semFlt===0){
-    fltEl.textContent='✓ Listo';subEl.textContent='Semana operativa completa';
+    fltEl.textContent='✓';subEl.textContent='Semana completa';
     cardEl.className='op-card good';
   } else {
     fltEl.textContent=semFlt;
-    subEl.textContent=remDays.length>0?`~${ritmoSem} por día hábil`:dow===0?'Mañana arranca':'¡Último día!';
+    subEl.textContent=remDays.length>0?`~${ritmoSem}/día restante`:'Último día!';
     cardEl.className='op-card warn';
   }
 
-  // Card 5: Ritmo mensual
-  document.getElementById('op-mes-re').textContent=s.cons; // conseguidas mes (no canceladas)
+  // Card ajustado color
+  const ajCard=document.getElementById('op-hoy-card2');
+  if(dow===0){ajCard.className='op-card';}
+  else if(rate!==null&&rate>0.2){ajCard.className='op-card warn';}
+  else{ajCard.className='op-card good';}
 
-  // ── Tabla días de la semana ──
+  // Días de la semana
   const dNames=['Lun','Mar','Mié','Jue','Vie','Sáb'];
   document.getElementById('op-days').innerHTML=weekDays.map((d,i)=>{
     const isToday=sd(d,today);
     const isPast=d<today&&!isToday;
+    const isFuture=d>today;
     const ddow=d.getDay();
     const obj=dailyTarget(ddow);
-    const cons=s.dayConsMap[d.toDateString()]||0; // conseguidas ese día
-    const real=s.dayReMap[d.toDateString()]||0;   // realizadas ese día
-    const ajD=rate!==null&&obj>0?Math.ceil(obj/(1-rate)):obj;
+    const got=s.dayRe[d.toDateString()]||0;
     let cls='day-card';
     if(isToday)cls+=' today';
-    else if(isPast)cls+=cons>=obj?' past-ok':' past-fail';
+    else if(isPast){cls+=got>=obj?' past-ok':' past-fail';}
     else cls+=' future';
-    let sub='';
-    if(obj===0) sub='Descanso';
-    else if(isToday) sub=`${cons} conseguidas · obj adj: ${ajD}`;
-    else if(isPast)  sub=`${cons} conseg · ${real} realiz`;
-    else             sub=`obj: ${obj} · aj: ${ajD}`;
-    return`<div class="\${cls}">
-      <div class="dc-day">\${dNames[i]} \${d.getDate()}</div>
-      <div class="dc-obj">\${obj>0?obj:'—'}</div>
-      <div class="dc-got">\${sub}</div>
+    const ajD=rate!==null&&obj>0?Math.ceil(obj/(1-rate)):obj;
+    return`<div class="${cls}">
+      <div class="dc-day">${dNames[i]} ${d.getDate()}</div>
+      <div class="dc-obj">${obj>0?obj:'—'}</div>
+      <div class="dc-got">${isPast||isToday?`${got} real · aj:${ajD}`:obj>0?`obj: ${obj}`:'Descanso'}</div>
     </div>`;
   }).join('');
 }
@@ -676,8 +603,8 @@ function renderComision(S){
 function renderCards(S){
   for(const vl of['xio','lc']){
     const s=S[vl];
-    const opPct=Math.min((s.cons/OP_MONTH)*100,100); // operativo: conseguidas (no canceladas)
-    const bnPct=Math.min((s.re/BON_GOAL)*100,100);   // bono: solo realizadas
+    const opPct=Math.min((s.re/OP_MONTH)*100,100);
+    const bnPct=Math.min((s.re/BON_GOAL)*100,100);
     const r=cRate(s);const rs=r!==null?(r*100).toFixed(1)+'%':'n/d';
     document.getElementById(`${vl}-re`).textContent=s.re;
     document.getElementById(`${vl}-ag`).textContent=s.ag;
@@ -715,7 +642,7 @@ function renderTodayDetail(S){
 }
 
 function renderLeads(S){
-  const u=[{n:'Xiomara',c:'var(--xio)',re:S.xio.re,cons:S.xio.cons,h:S.xio.agH},{n:'Luis Carlos',c:'var(--lc)',re:S.lc.re,cons:S.lc.cons,h:S.lc.agH}];
+  const u=[{n:'Xiomara',c:'var(--xio)',re:S.xio.re,h:S.xio.agH},{n:'Luis Carlos',c:'var(--lc)',re:S.lc.re,h:S.lc.agH}];
   const byR=[...u].sort((a,b)=>b.re-a.re);const byH=[...u].sort((a,b)=>b.h-a.h);
   document.getElementById('lv').innerHTML=byR.map((u,i)=>`<div class="lr"><div class="lpos${i===0?' f':''}">${i===0?'🥇':'🥈'}</div><div class="lnc"><div class="lname" style="color:${u.c}">${u.n}</div><div class="lsub">${((u.re/OP_MONTH)*100).toFixed(1)}% operativo · ${((u.re/BON_GOAL)*100).toFixed(1)}% bono</div></div><div class="lval" style="color:${u.c}">${u.re}</div></div>`).join('');
   document.getElementById('lh').innerHTML=byH.map((u,i)=>`<div class="lr"><div class="lpos${i===0?' f':''}">${i===0?'🥇':'🥈'}</div><div class="lnc"><div class="lname" style="color:${u.c}">${u.n}</div><div class="lsub">agendadas hoy</div></div><div class="lval" style="color:${u.c}">${u.h}</div></div>`).join('');
@@ -726,7 +653,7 @@ function switchUser(){cu=cu==='xio'?'lc':'xio';if(lastS)renderAll(lastS);}
 async function fetchAndRender(){
   showL(true);hideErr();
   try{const rows=await fetchV();renderAll(analyze(rows));toast('✓ Datos actualizados','ok');}
-  catch(e){console.error(e);showErr('Error: '+e.message);const em=()=>({re:0,ag:0,ca:0,pe:0,cons:0,agH:0,consH:0,reH:0,caH:0,wRe:[0,0,0,0],wCons:[0,0,0,0],todayL:[],dayConsMap:{},dayReMap:{}});renderAll({xio:em(),lc:em()});toast('⚠ Error','err');}
+  catch(e){console.error(e);showErr('Error: '+e.message);const em=()=>({re:0,ag:0,ca:0,pe:0,agH:0,reH:0,caH:0,wRe:[0,0,0,0],todayL:[],dayRe:{}});renderAll({xio:em(),lc:em()});toast('⚠ Error','err');}
   finally{showL(false);}
 }
 async function refreshData(){const b=document.getElementById('rf-btn');b.classList.add('spinning');await fetchAndRender();b.classList.remove('spinning');}
