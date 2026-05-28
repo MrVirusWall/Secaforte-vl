@@ -27,8 +27,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 @keyframes sp{to{transform:rotate(360deg)}}
 .lo-txt{font-family:var(--fd);font-size:12px;letter-spacing:3px;text-transform:uppercase;color:var(--text-dim);}
 #app{display:none;}#app.v{display:block;}
-
-/* HEADER */
 .hdr{padding:12px 22px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:50;box-shadow:0 1px 4px rgba(0,0,0,0.05);}
 .hdr-brand{font-family:var(--fd);font-size:18px;font-weight:900;letter-spacing:3px;}
 .hdr-brand span{color:var(--muted);}
@@ -38,99 +36,100 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 .ubadge.lc{border-color:var(--lc);color:var(--lc);background:var(--lc-dim);}
 .btn{background:none;border:1px solid var(--border);color:var(--text-dim);padding:5px 11px;border-radius:6px;cursor:pointer;font-size:10px;letter-spacing:2px;text-transform:uppercase;font-family:var(--fb);transition:all .2s;}
 .btn:hover{border-color:var(--xio);color:var(--xio);}
-.btn.spin-wrap .ri{display:inline-block;}
-.btn.spinning .ri{animation:sp .8s linear infinite;}
-
-/* DATE BAR */
 .dbar{background:var(--surface2);border-bottom:1px solid var(--border);padding:8px 22px;display:flex;align-items:center;justify-content:space-between;}
 .dbar-l{font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);}
 .dbar-l strong{color:var(--text);}
 .ldot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--green);animation:pu 2s infinite;margin-right:5px;vertical-align:middle;}
 @keyframes pu{0%,100%{box-shadow:0 0 0 0 rgba(22,163,74,.4)}50%{box-shadow:0 0 0 5px rgba(22,163,74,0)}}
 .dbar-r{font-size:11px;color:var(--text-dim);display:flex;align-items:center;}
-
 .err{background:var(--red-bg);border:1px solid var(--red-border);border-radius:10px;padding:10px 16px;margin:12px 22px;font-size:12px;color:var(--red);display:none;align-items:center;gap:8px;}
 .err.v{display:flex;}
-
 .main{padding:16px 22px;max-width:1200px;margin:0 auto;}
 .stitle{font-family:var(--fd);font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:10px;}
 .stitle::after{content:'';flex:1;height:1px;background:var(--border);}
 
-/* ═══ BLOQUE 1: OPERATIVO ═══ */
+/* OPERATIVO */
 .op-block{background:var(--blue-bg);border:1.5px solid var(--blue-border);border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:var(--sh);}
 .op-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
-.op-icon{font-size:22px;}
 .op-title{font-family:var(--fd);font-size:18px;font-weight:900;letter-spacing:1px;color:var(--blue);}
 .op-subtitle{font-size:11px;color:var(--text-dim);margin-top:2px;}
-.op-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
-.op-card{background:var(--surface);border:1px solid var(--blue-border);border-radius:10px;padding:12px 14px;text-align:center;}
-.op-card.highlight{background:var(--blue);border-color:var(--blue);}
-.op-card.highlight .oc-lbl{color:rgba(255,255,255,0.7);}
-.op-card.highlight .oc-val{color:#fff;}
-.op-card.highlight .oc-sub{color:rgba(255,255,255,0.6);}
-.op-card.warn{background:var(--orange-bg);border-color:var(--orange-border);}
-.op-card.warn .oc-val{color:var(--orange);}
-.op-card.good{background:var(--green-bg);border-color:var(--green-border);}
-.op-card.good .oc-val{color:var(--green);}
-.oc-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:4px;}
-.oc-val{font-family:var(--fd);font-size:26px;font-weight:900;line-height:1;color:var(--text);}
-.oc-sub{font-size:10px;color:var(--text-dim);margin-top:3px;}
+.op-top{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:12px;}
+.oc{background:var(--surface);border:1px solid var(--blue-border);border-radius:10px;padding:12px 14px;text-align:center;}
+.oc.hi{background:var(--blue);border-color:var(--blue);}
+.oc.hi .oc-l,.oc.hi .oc-s{color:rgba(255,255,255,0.7);}
+.oc.hi .oc-v{color:#fff;}
+.oc.warn{background:var(--orange-bg);border-color:var(--orange-border);}
+.oc.warn .oc-v{color:var(--orange);}
+.oc.good{background:var(--green-bg);border-color:var(--green-border);}
+.oc.good .oc-v{color:var(--green);}
+.oc-l{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:4px;}
+.oc-v{font-family:var(--fd);font-size:26px;font-weight:900;line-height:1;color:var(--text);}
+.oc-s{font-size:10px;color:var(--text-dim);margin-top:3px;}
 
-/* Semana operativa */
-.op-week{margin-top:12px;background:var(--surface);border:1px solid var(--blue-border);border-radius:10px;padding:14px;}
-.op-week-title{font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:10px;}
-.op-week-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;}
-.day-card{border-radius:8px;padding:9px 6px;text-align:center;border:1px solid var(--border);background:var(--bg);}
-.day-card.today{background:var(--blue);border-color:var(--blue);}
-.day-card.today .dc-day{color:rgba(255,255,255,0.7);}
-.day-card.today .dc-obj{color:#fff;}
-.day-card.today .dc-got{color:rgba(255,255,255,0.85);}
-.day-card.past-ok{background:var(--green-bg);border-color:var(--green-border);}
-.day-card.past-fail{background:var(--red-bg);border-color:var(--red-border);}
-.day-card.future{opacity:0.5;}
-.dc-day{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
-.dc-obj{font-family:var(--fd);font-size:18px;font-weight:900;line-height:1;color:var(--text);}
-.dc-got{font-size:10px;color:var(--text-dim);margin-top:2px;}
+/* Dias semana */
+.op-week{background:var(--surface);border:1px solid var(--blue-border);border-radius:10px;padding:14px;}
+.op-week-t{font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:10px;}
+.op-week-g{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;}
+.dc{border-radius:8px;padding:9px 6px;text-align:center;border:1px solid var(--border);background:var(--bg);}
+.dc.today{background:var(--blue);border-color:var(--blue);}
+.dc.today .dc-d,.dc.today .dc-s{color:rgba(255,255,255,0.7);}
+.dc.today .dc-v{color:#fff;}
+.dc.pok{background:var(--green-bg);border-color:var(--green-border);}
+.dc.pfail{background:var(--red-bg);border-color:var(--red-border);}
+.dc.fut{opacity:0.5;}
+.dc-d{font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+.dc-v{font-family:var(--fd);font-size:18px;font-weight:900;line-height:1;color:var(--text);}
+.dc-s{font-size:10px;color:var(--text-dim);margin-top:2px;}
 
-/* ═══ BLOQUE 2: COMISIÓN ═══ */
+/* SEMANA DETALLE */
+.sem-detail{margin-top:10px;background:var(--surface);border:1px solid var(--blue-border);border-radius:10px;padding:14px;}
+.sem-detail-t{font-family:var(--fd);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--blue);margin-bottom:10px;}
+.sem-rows{display:flex;flex-direction:column;gap:6px;}
+.sem-row{display:grid;grid-template-columns:120px 1fr 80px 80px 80px;align-items:center;gap:8px;padding:8px 10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:12px;}
+.sem-row.header{background:none;border:none;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:0 10px;margin-bottom:2px;}
+.sem-name{font-family:var(--fd);font-size:14px;font-weight:700;}
+.sem-bar-wrap{background:var(--border);border-radius:99px;height:6px;overflow:hidden;}
+.sem-bar-fill{height:100%;border-radius:99px;transition:width .8s;}
+.sem-num{font-family:var(--fd);font-size:14px;font-weight:700;text-align:center;}
+
+/* COMISION */
 .com-block{background:var(--gold-bg);border:1.5px solid var(--gold-border);border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:var(--sh);}
 .com-header{display:flex;align-items:center;gap:12px;margin-bottom:16px;}
 .com-title{font-family:var(--fd);font-size:18px;font-weight:900;letter-spacing:1px;color:var(--gold);}
 .com-subtitle{font-size:11px;color:var(--text-dim);margin-top:2px;}
-.com-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;}
-.com-card{background:var(--surface);border:1px solid var(--gold-border);border-radius:10px;padding:12px 14px;}
-.cc-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:3px;}
-.cc-val{font-family:var(--fd);font-size:24px;font-weight:900;line-height:1;color:var(--text);}
-.cc-sub{font-size:10px;color:var(--text-dim);margin-top:2px;}
+.com-top{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px;}
+.cc{background:var(--surface);border:1px solid var(--gold-border);border-radius:10px;padding:12px 14px;}
+.cc-l{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-dim);margin-bottom:3px;}
+.cc-v{font-family:var(--fd);font-size:24px;font-weight:900;line-height:1;color:var(--text);}
+.cc-s{font-size:10px;color:var(--text-dim);margin-top:2px;}
 .com-weeks{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
 .cw{background:var(--surface);border:1px solid var(--gold-border);border-radius:9px;padding:12px;position:relative;}
-.cw.cur{border-color:var(--gold);background:linear-gradient(135deg,#fffbeb,#fff);}
+.cw.cur{border-color:var(--gold);}
 .cw.cur::before{content:'HOY';position:absolute;top:-8px;left:50%;transform:translateX(-50%);background:var(--gold);color:#fff;font-family:var(--fd);font-size:8px;font-weight:900;letter-spacing:2px;padding:2px 7px;border-radius:99px;}
 .cw.pok{background:var(--green-bg);border-color:var(--green-border);}
 .cw.pfail{background:var(--red-bg);border-color:var(--red-border);}
-.cw-lbl{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
-.cw-bonus{font-family:var(--fd);font-size:16px;font-weight:800;color:var(--gold);margin-bottom:6px;}
+.cw-l{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.cw-b{font-family:var(--fd);font-size:16px;font-weight:800;color:var(--gold);margin-bottom:6px;}
 .cw-row{display:flex;align-items:center;gap:5px;font-size:11px;margin-bottom:3px;}
 .cw-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 .cw-name{font-weight:600;flex:1;font-size:10px;}
 .cw-val{font-family:var(--fd);font-size:12px;font-weight:700;}
 .cw-tgt{color:var(--muted);font-size:9px;}
 
-/* BATTLE CARDS */
+/* BATTLE */
 .battle-row{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;margin-bottom:16px;align-items:stretch;}
 .fc{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:18px;position:relative;overflow:hidden;box-shadow:var(--sh);}
 .fc::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
-.fc.xio::before{background:var(--xio);}
-.fc.lc::before{background:var(--lc);}
-.fc.mine.xio{border-color:var(--xio);box-shadow:0 0 0 2px rgba(0,153,204,.12),var(--sh);}
-.fc.mine.lc{border-color:var(--lc);box-shadow:0 0 0 2px rgba(224,90,26,.12),var(--sh);}
+.fc.xio::before{background:var(--xio);}.fc.lc::before{background:var(--lc);}
+.fc.mine.xio{border-color:var(--xio);box-shadow:0 0 0 2px rgba(0,153,204,.1),var(--sh);}
+.fc.mine.lc{border-color:var(--lc);box-shadow:0 0 0 2px rgba(224,90,26,.1),var(--sh);}
 .ft{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
 .fav{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:17px;font-weight:900;flex-shrink:0;}
 .fc.xio .fav{background:var(--xio-dim);color:var(--xio);border:2px solid var(--xio);}
 .fc.lc .fav{background:var(--lc-dim);color:var(--lc);border:2px solid var(--lc);}
 .fn{font-family:var(--fd);font-size:21px;font-weight:900;letter-spacing:1px;line-height:1;}
 .fc.xio .fn{color:var(--xio);}.fc.lc .fn{color:var(--lc);}
-.fr{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:2px;}
+.fr2{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-top:2px;}
 .frank{margin-left:auto;font-family:var(--fd);font-size:30px;font-weight:900;opacity:.07;}
 .sr{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:10px;}
 .sb{background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:9px 11px;}
@@ -144,13 +143,14 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 .ph{display:flex;justify-content:space-between;font-size:10px;color:var(--text-dim);margin-bottom:4px;font-family:var(--fd);letter-spacing:1px;}
 .pt{height:7px;background:var(--border);border-radius:99px;overflow:hidden;}
 .pf{height:100%;border-radius:99px;transition:width 1s cubic-bezier(.34,1.56,.64,1);}
-.fc.xio .pf{background:linear-gradient(90deg,rgba(0,153,204,.4),var(--xio));}
-.fc.lc .pf{background:linear-gradient(90deg,rgba(224,90,26,.4),var(--lc));}
+.fc.xio .pf.op{background:linear-gradient(90deg,rgba(0,153,204,.4),var(--xio));}
+.fc.lc .pf.op{background:linear-gradient(90deg,rgba(224,90,26,.4),var(--lc));}
+.pf.bn{background:linear-gradient(90deg,#fbbf24,var(--gold));}
 .vs-c{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:0 4px;}
 .vs-b{font-family:var(--fd);font-size:20px;font-weight:900;color:var(--border);letter-spacing:2px;}
 .vs-l{width:1px;flex:1;background:var(--border);}
 
-/* HOY DETAIL */
+/* HOY DETALLE */
 .hg{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px;}
 .hc{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:15px;box-shadow:var(--sh);}
 .hc-t{font-family:var(--fd);font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;}
@@ -162,7 +162,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 .hi{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:6px 10px;display:flex;align-items:center;gap:6px;font-size:11px;}
 .hd{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
 .hd.realizada{background:var(--green);}.hd.pendiente{background:var(--gold);}.hd.cancelada{background:var(--red);}
-.ht{font-family:var(--fd);font-size:11px;font-weight:700;color:var(--text-dim);flex-shrink:0;min-width:36px;}
+.ht2{font-family:var(--fd);font-size:11px;font-weight:700;color:var(--text-dim);flex-shrink:0;min-width:36px;}
 .hm{flex:1;font-weight:500;}
 .he{font-size:9px;letter-spacing:1px;text-transform:uppercase;font-weight:700;}
 .he.realizada{color:var(--green);}.he.pendiente{color:var(--gold);}.he.cancelada{color:var(--red);}
@@ -184,16 +184,15 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 .toast{position:fixed;bottom:16px;right:16px;padding:9px 16px;border-radius:7px;font-family:var(--fd);font-size:12px;font-weight:700;letter-spacing:1px;transform:translateY(60px);opacity:0;transition:all .3s;z-index:999;box-shadow:0 4px 16px rgba(0,0,0,.12);}
 .toast.ok{background:var(--green);color:#fff;}.toast.err{background:var(--red);color:#fff;}
 .toast.show{transform:translateY(0);opacity:1;}
-
 @keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 .ani{animation:fu .4s ease forwards;}
-.d1{animation-delay:.04s;opacity:0}.d2{animation-delay:.08s;opacity:0}.d3{animation-delay:.12s;opacity:0}.d4{animation-delay:.16s;opacity:0}.d5{animation-delay:.2s;opacity:0}
-
+.d1{animation-delay:.04s;opacity:0}.d2{animation-delay:.08s;opacity:0}.d3{animation-delay:.12s;opacity:0}.d4{animation-delay:.16s;opacity:0}
 @media(max-width:768px){
   .battle-row{grid-template-columns:1fr;}.vs-c{display:none;}
-  .op-grid{grid-template-columns:repeat(3,1fr);}.op-week-grid{grid-template-columns:repeat(3,1fr);}
-  .com-grid{grid-template-columns:repeat(2,1fr);}.com-weeks{grid-template-columns:repeat(2,1fr);}
+  .op-top{grid-template-columns:repeat(3,1fr);}.op-week-g{grid-template-columns:repeat(3,1fr);}
+  .com-top{grid-template-columns:repeat(2,1fr);}.com-weeks{grid-template-columns:repeat(2,1fr);}
   .lg,.hg{grid-template-columns:1fr;}.main{padding:12px 14px;}
+  .sem-row{grid-template-columns:90px 1fr 60px 60px 60px;}
 }
 </style>
 </head>
@@ -203,8 +202,8 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
   <div class="hdr">
     <div class="hdr-brand">SECAFORTE <span>· ARENA VL</span></div>
     <div class="hdr-r">
-      <button class="btn" id="sw-btn" onclick="switchUser()">Ver Xiomara</button>
-      <button class="btn spin-wrap" id="rf-btn" onclick="refreshData()"><span class="ri">↻</span> Actualizar</button>
+      <button class="btn" id="sw-btn" onclick="switchUser()">Ver Luis Carlos</button>
+      <button class="btn" id="rf-btn" onclick="refreshData()">↻ Actualizar</button>
       <div class="ubadge" id="ubadge"></div>
     </div>
   </div>
@@ -213,324 +212,328 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
     <div class="dbar-r"><span class="ldot"></span><span id="dl"></span></div>
   </div>
   <div class="err" id="err-b">⚠️ <span id="err-m"></span></div>
-
   <div class="main">
 
-    <!-- ═══ BLOQUE OPERATIVO ═══ -->
+    <!-- OPERATIVO -->
     <div class="op-block ani d1">
       <div class="op-header">
-        <div class="op-icon">📋</div>
+        <div style="font-size:22px">📋</div>
         <div>
           <div class="op-title">AGENDA DE LOS ATO — Objetivo Operativo</div>
-          <div class="op-subtitle">Visitas de PRESUPUESTO que debés conseguir para llenar la agenda · L-V: 5/día · Sáb: 3/día</div>
+          <div class="op-subtitle">Visitas de PRESUPUESTO conseguidas · L–V: 5/día · Sáb: 3/día · Pendientes + Realizadas cuentan · Canceladas no cuentan</div>
         </div>
       </div>
-      <div class="op-grid">
-        <div class="op-card highlight">
-          <div class="oc-lbl">Conseguir HOY</div>
-          <div class="oc-val" id="op-hoy">—</div>
-          <div class="oc-sub">visitas a agendar</div>
+      <div class="op-top">
+        <div class="oc hi" id="oc-hoy">
+          <div class="oc-l">Conseguir HOY</div>
+          <div class="oc-v" id="op-hoy-v">—</div>
+          <div class="oc-s" id="op-hoy-s">—</div>
         </div>
-        <div class="op-card" id="op-hoy-card2">
-          <div class="oc-lbl">Ajustado por caída</div>
-          <div class="oc-val" id="op-hoy-aj">—</div>
-          <div class="oc-sub">considerando cancelaciones</div>
+        <div class="oc" id="oc-aj">
+          <div class="oc-l">Ajustado por caída</div>
+          <div class="oc-v" id="op-aj-v">—</div>
+          <div class="oc-s" id="op-aj-s">—</div>
         </div>
-        <div class="op-card">
-          <div class="oc-lbl">Conseguidas esta semana</div>
-          <div class="oc-val" id="op-sem-re">—</div>
-          <div class="oc-sub">de <span id="op-sem-obj">28</span> objetivo</div>
+        <div class="oc">
+          <div class="oc-l">Conseguidas esta semana</div>
+          <div class="oc-v" id="op-sem-cons">—</div>
+          <div class="oc-s">de <span id="op-sem-obj">28</span> objetivo</div>
         </div>
-        <div class="op-card" id="op-sem-card">
-          <div class="oc-lbl">Faltan esta semana</div>
-          <div class="oc-val" id="op-sem-flt">—</div>
-          <div class="oc-sub" id="op-sem-sub">—</div>
+        <div class="oc" id="oc-flt">
+          <div class="oc-l">Faltan esta semana</div>
+          <div class="oc-v" id="op-sem-flt">—</div>
+          <div class="oc-s" id="op-sem-flt-s">—</div>
         </div>
-        <div class="op-card">
-          <div class="oc-lbl">Ritmo mensual</div>
-          <div class="oc-val" id="op-mes-re">—</div>
-          <div class="oc-sub">de 112 objetivo mes</div>
+        <div class="oc">
+          <div class="oc-l">Conseguidas este mes</div>
+          <div class="oc-v" id="op-mes-cons">—</div>
+          <div class="oc-s">de 112 objetivo</div>
         </div>
       </div>
-      <!-- Días de la semana -->
+
+      <!-- Tabla semanal: conseguidas vs realizadas por día -->
       <div class="op-week">
-        <div class="op-week-title">SEMANA ACTUAL — Días hábiles</div>
-        <div class="op-week-grid" id="op-days"></div>
+        <div class="op-week-t">SEMANA ACTUAL — conseguidas vs realizadas por día</div>
+        <div class="op-week-g" id="op-days"></div>
+      </div>
+
+      <!-- Detalle conseguidas semana: pendientes/realizadas/canceladas -->
+      <div class="sem-detail" style="margin-top:10px">
+        <div class="sem-detail-t">DESGLOSE SEMANAL — estado de visitas conseguidas</div>
+        <div class="sem-rows">
+          <div class="sem-row header">
+            <div>VL</div><div></div><div style="text-align:center">Conseguidas</div><div style="text-align:center">Realizadas</div><div style="text-align:center">Pendientes</div>
+          </div>
+          <div class="sem-row" id="sem-xio"></div>
+          <div class="sem-row" id="sem-lc"></div>
+        </div>
       </div>
     </div>
 
-    <!-- ═══ BLOQUE COMISIÓN ═══ -->
+    <!-- COMISION -->
     <div class="com-block ani d2">
       <div class="com-header">
         <div style="font-size:22px">💰</div>
         <div>
           <div class="com-title">COMISIÓN — Objetivo de Bono</div>
-          <div class="com-subtitle">80 visitas/mes · Bono máximo Bs 2,000 · Independiente del operativo</div>
+          <div class="com-subtitle">80 visitas REALIZADAS/mes · Bono máximo Bs 2,000 · Independiente del operativo</div>
         </div>
       </div>
-      <div class="com-grid">
-        <div class="com-card">
-          <div class="cc-lbl">Realizadas mes</div>
-          <div class="cc-val" id="cm-re">—</div>
-          <div class="cc-sub">de 80 para bono</div>
+      <div class="com-top">
+        <div class="cc">
+          <div class="cc-l">Realizadas mes</div>
+          <div class="cc-v" id="cm-re">—</div>
+          <div class="cc-s">de 80 para bono</div>
         </div>
-        <div class="com-card">
-          <div class="cc-lbl">Faltan para bono</div>
-          <div class="cc-val" id="cm-flt" style="color:var(--orange)">—</div>
-          <div class="cc-sub">visitas presupuesto</div>
+        <div class="cc">
+          <div class="cc-l">Faltan para bono</div>
+          <div class="cc-v" id="cm-flt" style="color:var(--orange)">—</div>
+          <div class="cc-s">visitas realizadas</div>
         </div>
-        <div class="com-card">
-          <div class="cc-lbl">Tasa de caída</div>
-          <div class="cc-val" id="cm-rate" style="color:var(--red)">—</div>
-          <div class="cc-sub">canceladas/agendadas</div>
+        <div class="cc">
+          <div class="cc-l">Tasa de caída</div>
+          <div class="cc-v" id="cm-rate" style="color:var(--red)">—</div>
+          <div class="cc-s">canceladas/agendadas</div>
         </div>
-        <div class="com-card" style="background:var(--gold-bg);">
-          <div class="cc-lbl">Bono acumulado</div>
-          <div class="cc-val" id="cm-bon" style="color:var(--gold)">Bs 0</div>
-          <div class="cc-sub" id="cm-bon-s">—</div>
+        <div class="cc" style="background:var(--gold-bg)">
+          <div class="cc-l">Bono acumulado</div>
+          <div class="cc-v" id="cm-bon" style="color:var(--gold)">Bs 0</div>
+          <div class="cc-s" id="cm-bon-s">—</div>
         </div>
       </div>
       <div class="com-weeks" id="com-weeks"></div>
     </div>
 
-    <!-- BATTLE CARDS -->
+    <!-- BATTLE -->
     <div class="stitle ani d3">Comparativa del mes</div>
     <div class="battle-row ani d3">
       <div class="fc xio" id="card-xio">
-        <div class="ft"><div class="fav">X</div><div><div class="fn">XIOMARA</div><div class="fr">Vendedora de Leads</div></div><div class="frank">#<span id="rk-xio">1</span></div></div>
+        <div class="ft"><div class="fav">X</div><div><div class="fn">XIOMARA</div><div class="fr2">Vendedora de Leads</div></div><div class="frank">#<span id="rk-xio">1</span></div></div>
         <div class="sr">
-          <div class="sb"><div class="sb-l">Realizadas mes</div><div class="sb-v" id="xio-re">0</div><div class="sb-s">presupuesto</div><div class="cbadge" id="xio-cb">—</div></div>
-          <div class="sb"><div class="sb-l">Agendadas mes</div><div class="sb-v" id="xio-ag">0</div><div class="sb-s">total creadas</div></div>
+          <div class="sb"><div class="sb-l">Conseguidas mes</div><div class="sb-v" id="xio-cons">0</div><div class="sb-s">pend+real, no cancel</div><div class="cbadge" id="xio-cb">—</div></div>
+          <div class="sb"><div class="sb-l">Realizadas mes</div><div class="sb-v" id="xio-re">0</div><div class="sb-s">para bono comisión</div></div>
         </div>
         <div class="sr">
           <div class="sb"><div class="sb-l">Canceladas</div><div class="sb-v" id="xio-ca" style="color:var(--red)">0</div><div class="sb-s">tasa: <span id="xio-ts">0%</span></div></div>
           <div class="sb"><div class="sb-l">Pendientes</div><div class="sb-v" id="xio-pe" style="color:var(--orange)">0</div><div class="sb-s">por realizarse</div></div>
         </div>
-        <div class="pw"><div class="ph"><span>Avance operativo (112)</span><span id="xio-op-pct">0%</span></div><div class="pt"><div class="pf" id="xio-op-bar" style="width:0%"></div></div></div>
-        <div class="pw"><div class="ph"><span>Avance bono (80)</span><span id="xio-bn-pct">0%</span></div><div class="pt" style="background:#fde68a"><div class="pf" id="xio-bn-bar" style="width:0%;background:var(--gold)"></div></div></div>
+        <div class="pw"><div class="ph"><span>Avance operativo (112)</span><span id="xio-op-pct">0%</span></div><div class="pt"><div class="pf op" id="xio-op-bar" style="width:0%"></div></div></div>
+        <div class="pw"><div class="ph"><span>Avance bono (80 realizadas)</span><span id="xio-bn-pct">0%</span></div><div class="pt" style="background:#fde68a"><div class="pf bn" id="xio-bn-bar" style="width:0%"></div></div></div>
       </div>
       <div class="vs-c"><div class="vs-l"></div><div class="vs-b">VS</div><div class="vs-l"></div></div>
       <div class="fc lc" id="card-lc">
-        <div class="ft"><div class="fav">LC</div><div><div class="fn">LUIS CARLOS</div><div class="fr">Vendedor de Leads</div></div><div class="frank">#<span id="rk-lc">2</span></div></div>
+        <div class="ft"><div class="fav">LC</div><div><div class="fn">LUIS CARLOS</div><div class="fr2">Vendedor de Leads</div></div><div class="frank">#<span id="rk-lc">2</span></div></div>
         <div class="sr">
-          <div class="sb"><div class="sb-l">Realizadas mes</div><div class="sb-v" id="lc-re">0</div><div class="sb-s">presupuesto</div><div class="cbadge" id="lc-cb">—</div></div>
-          <div class="sb"><div class="sb-l">Agendadas mes</div><div class="sb-v" id="lc-ag">0</div><div class="sb-s">total creadas</div></div>
+          <div class="sb"><div class="sb-l">Conseguidas mes</div><div class="sb-v" id="lc-cons">0</div><div class="sb-s">pend+real, no cancel</div><div class="cbadge" id="lc-cb">—</div></div>
+          <div class="sb"><div class="sb-l">Realizadas mes</div><div class="sb-v" id="lc-re">0</div><div class="sb-s">para bono comisión</div></div>
         </div>
         <div class="sr">
           <div class="sb"><div class="sb-l">Canceladas</div><div class="sb-v" id="lc-ca" style="color:var(--red)">0</div><div class="sb-s">tasa: <span id="lc-ts">0%</span></div></div>
           <div class="sb"><div class="sb-l">Pendientes</div><div class="sb-v" id="lc-pe" style="color:var(--orange)">0</div><div class="sb-s">por realizarse</div></div>
         </div>
-        <div class="pw"><div class="ph"><span>Avance operativo (112)</span><span id="lc-op-pct">0%</span></div><div class="pt"><div class="pf" id="lc-op-bar" style="width:0%"></div></div></div>
-        <div class="pw"><div class="ph"><span>Avance bono (80)</span><span id="lc-bn-pct">0%</span></div><div class="pt" style="background:#fde68a"><div class="pf" id="lc-bn-bar" style="width:0%;background:var(--gold)"></div></div></div>
+        <div class="pw"><div class="ph"><span>Avance operativo (112)</span><span id="lc-op-pct">0%</span></div><div class="pt"><div class="pf op" id="lc-op-bar" style="width:0%"></div></div></div>
+        <div class="pw"><div class="ph"><span>Avance bono (80 realizadas)</span><span id="lc-bn-pct">0%</span></div><div class="pt" style="background:#fde68a"><div class="pf bn" id="lc-bn-bar" style="width:0%"></div></div></div>
       </div>
     </div>
 
     <!-- HOY DETALLE -->
-    <div class="stitle ani d4">Visitas de hoy — detalle</div>
+    <div class="stitle ani d4">Visitas de hoy — programadas</div>
     <div class="hg ani d4">
       <div class="hc"><div class="hc-t" style="color:var(--xio)">Xiomara</div>
         <div class="hs">
-          <div class="hst"><div class="hst-l">Agendadas</div><div class="hst-v" id="hx-ag">0</div></div>
-          <div class="hst"><div class="hst-l">Realizadas</div><div class="hst-v" style="color:var(--green)" id="hx-re">0</div></div>
-          <div class="hst"><div class="hst-l">Canceladas</div><div class="hst-v" style="color:var(--red)" id="hx-ca">0</div></div>
+          <div class="hst"><div class="hst-l">Conseguidas hoy</div><div class="hst-v" id="hx-cons">0</div></div>
+          <div class="hst"><div class="hst-l">Realizadas hoy</div><div class="hst-v" style="color:var(--green)" id="hx-re">0</div></div>
+          <div class="hst"><div class="hst-l">Canceladas hoy</div><div class="hst-v" style="color:var(--red)" id="hx-ca">0</div></div>
         </div>
         <div class="hl" id="hl-xio"></div>
       </div>
       <div class="hc"><div class="hc-t" style="color:var(--lc)">Luis Carlos</div>
         <div class="hs">
-          <div class="hst"><div class="hst-l">Agendadas</div><div class="hst-v" id="hl2-ag">0</div></div>
-          <div class="hst"><div class="hst-l">Realizadas</div><div class="hst-v" style="color:var(--green)" id="hl2-re">0</div></div>
-          <div class="hst"><div class="hst-l">Canceladas</div><div class="hst-v" style="color:var(--red)" id="hl2-ca">0</div></div>
+          <div class="hst"><div class="hst-l">Conseguidas hoy</div><div class="hst-v" id="hl2-cons">0</div></div>
+          <div class="hst"><div class="hst-l">Realizadas hoy</div><div class="hst-v" style="color:var(--green)" id="hl2-re">0</div></div>
+          <div class="hst"><div class="hst-l">Canceladas hoy</div><div class="hst-v" style="color:var(--red)" id="hl2-ca">0</div></div>
         </div>
         <div class="hl" id="hl-lc"></div>
       </div>
     </div>
 
     <!-- LEADS -->
-    <div class="stitle ani d5">Rankings del mes</div>
-    <div class="lg ani d5">
-      <div class="lc2"><div class="lt">🏆 Realizadas (operativo)</div><div id="lv"></div></div>
-      <div class="lc2"><div class="lt">📅 Agendadas hoy</div><div id="lh"></div></div>
+    <div class="stitle ani d4">Rankings del mes</div>
+    <div class="lg ani d4">
+      <div class="lc2"><div class="lt">🏆 Conseguidas (operativo)</div><div id="lv"></div></div>
+      <div class="lc2"><div class="lt">⭐ Realizadas (bono)</div><div id="lre"></div></div>
     </div>
-
   </div>
 </div>
 <div class="toast" id="toast"></div>
+
 <script>
-// ── CONFIG ─────────────────────────────────────────────
 const SHEET_ID  = '1PwYUmaX800n4H_kYGWlqleAbdS5h3bBivHswaAMem6Y';
 const SHEET_TAB = 'Visitas';
-
-// Operativo: 2 ATO × días
-const OP_DAY_LV  = 5;   // por VL, lunes-viernes
-const OP_DAY_SAB = 3;   // por VL, sábado
-const OP_WEEK    = 28;  // 5×5 + 3 = 28 por VL/semana
-const OP_MONTH   = 112; // 28×4
-
-// Comisión (política)
-const BON_GOAL   = 80;
-const BON_W_GOAL = 20;
-const WBS = {
-  28:[{l:'Sem 1',r:'1–7',d:[1,7],b:200},{l:'Sem 2',r:'8–14',d:[8,14],b:400},{l:'Sem 3',r:'15–21',d:[15,21],b:500},{l:'Sem 4',r:'22–28',d:[22,28],b:800}],
-  30:[{l:'Sem 1',r:'1–7',d:[1,7],b:200},{l:'Sem 2',r:'8–15',d:[8,15],b:400},{l:'Sem 3',r:'16–22',d:[16,22],b:500},{l:'Sem 4',r:'23–30',d:[23,30],b:800}],
-  31:[{l:'Sem 1',r:'1–8',d:[1,8],b:200},{l:'Sem 2',r:'9–16',d:[9,16],b:400},{l:'Sem 3',r:'17–23',d:[17,23],b:500},{l:'Sem 4',r:'24–31',d:[24,31],b:800}],
+const OP_LV=5, OP_SAB=3, OP_WEEK=28, OP_MONTH=112;
+const BON_GOAL=80, BON_W=20;
+const WBS={
+  28:[{l:'Sem 1',r:'1–7', d:[1,7], b:200},{l:'Sem 2',r:'8–14', d:[8,14], b:400},{l:'Sem 3',r:'15–21',d:[15,21],b:500},{l:'Sem 4',r:'22–28',d:[22,28],b:800}],
+  30:[{l:'Sem 1',r:'1–7', d:[1,7], b:200},{l:'Sem 2',r:'8–15', d:[8,15], b:400},{l:'Sem 3',r:'16–22',d:[16,22],b:500},{l:'Sem 4',r:'23–30',d:[23,30],b:800}],
+  31:[{l:'Sem 1',r:'1–8', d:[1,8], b:200},{l:'Sem 2',r:'9–16', d:[9,16], b:400},{l:'Sem 3',r:'17–23',d:[17,23],b:500},{l:'Sem 4',r:'24–31',d:[24,31],b:800}],
 };
-
 const VL_MAP={'pirkavlocal@gmail.com':'xio','info@pirkastone.com.bo':'lc','us0002':'xio','us0003':'lc'};
 const VL_NAMES={xio:'Xiomara',lc:'Luis Carlos'};
 const DIAS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const DNAMES=['Lun','Mar','Mié','Jue','Vie','Sáb'];
 
 let cu='xio', lastS=null;
 
-// ── HELPERS ────────────────────────────────────────────
-function getDIM(){ const t=new Date(); return new Date(t.getFullYear(),t.getMonth()+1,0).getDate(); }
-function getW(){ return WBS[getDIM()]||WBS[30]; }
-function getWi(){ const d=new Date().getDate(); return getW().findIndex(w=>d>=w.d[0]&&d<=w.d[1]); }
+function getDIM(){const t=new Date();return new Date(t.getFullYear(),t.getMonth()+1,0).getDate();}
+function getW(){return WBS[getDIM()]||WBS[30];}
+function getWi(){const d=new Date().getDate();return getW().findIndex(w=>d>=w.d[0]&&d<=w.d[1]);}
+function dailyTarget(dow){if(dow>=1&&dow<=5)return OP_LV;if(dow===6)return OP_SAB;return 0;}
+function isWorkday(dow){return dow>=1&&dow<=6;}
 
-// ¿Es día hábil? (1=Lunes…6=Sábado, 0=Dom)
-function isWorkday(dow){ return dow>=1&&dow<=6; }
-// Objetivo diario por dow
-function dailyTarget(dow){ if(dow===6)return OP_DAY_SAB; if(dow>=1&&dow<=5)return OP_DAY_LV; return 0; }
-
-// Días hábiles de la semana actual (L-S)
+// Lunes de la semana actual
+function getMondayOfWeek(date){
+  const d=new Date(date);
+  const dow=d.getDay();
+  const diff=dow===0?-6:1-dow;
+  d.setDate(d.getDate()+diff);
+  d.setHours(0,0,0,0);
+  return d;
+}
+// 6 días hábiles de la semana (L-S)
 function getWeekDays(){
-  const today=new Date();
-  const dow=today.getDay(); // 0=dom
-  // Retroceder al lunes de esta semana
-  const mondayOffset=dow===0?-6:(1-dow);
-  const monday=new Date(today);
-  monday.setDate(today.getDate()+mondayOffset);
+  const monday=getMondayOfWeek(new Date());
   const days=[];
   for(let i=0;i<6;i++){
     const d=new Date(monday);
     d.setDate(monday.getDate()+i);
-    // Solo hasta sábado (i=0 lun … i=5 sab)
     days.push(d);
   }
   return days;
 }
 
-// ── FETCH ──────────────────────────────────────────────
-async function fetchV(){
-  const t=new Date(),y=t.getFullYear(),m=String(t.getMonth()+1).padStart(2,'0');
-  const q=encodeURIComponent(`select * where C >= date '${y}-${m}-01'`);
-  const r=await fetch(`https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_TAB)}&tq=${q}`);
-  if(!r.ok)throw new Error(`HTTP ${r.status}`);
-  return parseCSV(await r.text());
-}
-function parseCSV(csv){
-  const lines=csv.trim().split('\n');if(lines.length<2)return[];
-  const H=sl(lines[0]).map(h=>h.replace(/^"|"$/g,'').trim());
-  return lines.slice(1).map(l=>{const v=sl(l),o={};H.forEach((h,i)=>{o[h]=(v[i]||'').replace(/^"|"$/g,'').trim();});return o;});
-}
-function sl(l){const r=[];let c='',q=false;for(const ch of l){if(ch==='"'){q=!q;}else if(ch===','&&!q){r.push(c);c='';}else c+=ch;}r.push(c);return r;}
-function pd(s){if(!s)return null;s=s.trim();let m;m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);return null;}
-function pdt(s){if(!s)return null;s=s.trim();let m;m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})/);if(m)return new Date(+m[3],+m[2]-1,+m[1],+m[4],+m[5]);m=s.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5]);return pd(s);}
 function sd(a,b){return a&&b&&a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth()&&a.getDate()===b.getDate();}
 function sm(a,b){return a&&b&&a.getFullYear()===b.getFullYear()&&a.getMonth()===b.getMonth();}
-function rvl(raw){if(!raw)return null;const k=raw.toLowerCase().trim();for(const[key,val]of Object.entries(VL_MAP)){if(k===key||k.includes(key))return val;}return null;}
+// ¿Fecha está en la semana L-S actual?
+function isThisWeek(d){
+  if(!d)return false;
+  const monday=getMondayOfWeek(new Date());
+  const saturday=new Date(monday);saturday.setDate(monday.getDate()+5);saturday.setHours(23,59,59);
+  return d>=monday&&d<=saturday;
+}
 
-// ── ANALYZE ────────────────────────────────────────────
+function rvl(raw){
+  if(!raw)return null;
+  const k=raw.toLowerCase().trim();
+  for(const[key,val]of Object.entries(VL_MAP)){if(k===key||k.includes(key))return val;}
+  return null;
+}
+
+function pd(s){
+  if(!s)return null;s=s.trim();let m;
+  m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);if(m)return new Date(+m[3],+m[2]-1,+m[1]);
+  m=s.match(/^(\d{4})-(\d{2})-(\d{2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3]);
+  return null;
+}
+function pdt(s){
+  if(!s)return null;s=s.trim();let m;
+  m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})\s+(\d{1,2}):(\d{2})/);if(m)return new Date(+m[3],+m[2]-1,+m[1],+m[4],+m[5]);
+  m=s.match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);if(m)return new Date(+m[1],+m[2]-1,+m[3],+m[4],+m[5]);
+  return pd(s);
+}
+
+// ── ANALYZE ──────────────────────────────────────────────────────────────────
 function analyze(rows){
   const today=new Date();
   const W=getW();
-  const weekDays=getWeekDays();
-  // Estado obj:
-  //   ag    = todas las visitas Presupuesto del mes (agendadas)
-  //   ca    = canceladas (no cuentan)
-  //   re    = realizadas (para comisión y operativo realizado)
-  //   pe    = pendientes
-  //   cons  = CONSEGUIDAS: Presupuesto, no Cancelada → cuenta para objetivo operativo (por FechaCreacion)
-  //   dayConsDIA = conseguidas por día (FechaCreacion, no Cancelada) → semana operativa
-  //   dayRe[dia] = realizadas por día → para verificar resultado
-  //   wRe[i]     = realizadas por semana comisión
-  //   wCons[i]   = conseguidas por semana comisión (no canceladas)
-  //   agH / consH / reH / caH = hoy (FechaCreacion = hoy)
-  const e=()=>({re:0,ag:0,ca:0,pe:0,cons:0,agH:0,consH:0,reH:0,caH:0,wRe:[0,0,0,0],wCons:[0,0,0,0],todayL:[],dayConsMap:{},dayReMap:{}});
+  const e=()=>({
+    // MES
+    ag:0,     // todas las presupuesto agendadas en el mes
+    cons:0,   // conseguidas mes: presupuesto, no cancelada (pendiente + realizada)
+    re:0,     // realizadas mes (para bono comisión)
+    ca:0,     // canceladas mes
+    pe:0,     // pendientes mes
+    // SEMANA (conseguidas: no canceladas, por FechaCreacion en semana actual)
+    semCons:0,  // conseguidas semana
+    semRe:0,    // realizadas semana
+    semPe:0,    // pendientes semana
+    semCa:0,    // canceladas semana
+    // HOY (FechaCreacion = hoy, presupuesto)
+    consH:0, reH:0, caH:0,
+    // Por día (FechaCreacion) para tabla
+    dayConsMap:{},  // conseguidas (no cancel) por día
+    dayReMap:{},    // realizadas por día
+    // Para bono semanal (realizadas por semana comisión)
+    wRe:[0,0,0,0],
+    // Lista visitas programadas hoy (FechaHora = hoy)
+    todayL:[]
+  });
   const S={xio:e(),lc:e()};
 
   for(const row of rows){
-    // Identificar VL: primero Creador_Visita, fallback Modificador_Visita
-    const vlCreador=rvl(row['Creador_Visita']);
-    const vlMod=rvl(row['Modificador_Visita']);
-    const vl=vlCreador||vlMod;
+    const vl=rvl(row['Creador_Visita'])||rvl(row['Modificador_Visita']);
     if(!vl)continue;
-
     const est=(row['Estado_Visita']||'').toLowerCase().trim();
     const mot=(row['Motivo_Visita']||'').toLowerCase().trim();
+    if(mot!=='presupuesto')continue; // solo presupuesto cuenta para objetivos
+
     const fc=pd(row['FechaCreacion_Visita']);
     const fv=pdt(row['FechaHora_Visita']);
     const s=S[vl];
-    const isCancelada=est==='cancelada';
-    const isRealizada=est==='realizada';
+    const isCa=est==='cancelada';
+    const isRe=est==='realizada';
+    const isPe=!isCa&&!isRe; // pendiente
 
-    // ── Solo Presupuesto del mes en curso ──
-    if(mot==='presupuesto'&&sm(fc,today)){
+    // ── MES en curso ──
+    if(sm(fc,today)){
       s.ag++;
-      if(isCancelada)     s.ca++;
-      else if(isRealizada){s.re++; s.pe=s.pe;}  // no suma a pendientes
-      else                 s.pe++;
+      if(isCa)       s.ca++;
+      else if(isRe) {s.re++;s.cons++;}
+      else          {s.pe++;s.cons++;}
 
-      // CONSEGUIDA = agendada y NO cancelada (puede ser pendiente o realizada)
-      if(!isCancelada){
-        s.cons++;
-        if(fc){
-          // mapa por día para bloque operativo semanal
-          const dk=fc.toDateString();
-          s.dayConsMap[dk]=(s.dayConsMap[dk]||0)+1;
-          // semana de comisión (para bonus, cuenta solo realizadas)
-          const d=fc.getDate();
-          const wi=W.findIndex(w=>d>=w.d[0]&&d<=w.d[1]);
-          if(wi>=0){
-            s.wCons[wi]++;
-          }
-        }
-      }
-
-      // realizadas por semana comisión (separado)
-      if(fc&&isRealizada){
+      // bono semanal comisión (realizadas por semana del mes)
+      if(isRe&&fc){
         const d=fc.getDate();
         const wi=W.findIndex(w=>d>=w.d[0]&&d<=w.d[1]);
-        if(wi>=0) s.wRe[wi]++;
+        if(wi>=0)s.wRe[wi]++;
+      }
+    }
+
+    // ── SEMANA actual (L-S) por FechaCreacion ──
+    if(isThisWeek(fc)){
+      if(isCa)       s.semCa++;
+      else if(isRe) {s.semCons++;s.semRe++;}
+      else          {s.semCons++;s.semPe++;}
+
+      // mapa por día para tabla
+      if(!isCa&&fc){
+        const dk=fc.toDateString();
+        s.dayConsMap[dk]=(s.dayConsMap[dk]||0)+1;
+      }
+      if(isRe&&fc){
         const dk=fc.toDateString();
         s.dayReMap[dk]=(s.dayReMap[dk]||0)+1;
       }
     }
 
-    // ── Hoy (FechaCreacion = hoy) ─ cualquier motivo para el conteo del día ──
-    if(sd(fc,today)&&mot==='presupuesto'){
-      s.agH++;
-      if(!isCancelada) s.consH++;
-      if(isRealizada)  s.reH++;
-      if(isCancelada)  s.caH++;
+    // ── HOY (FechaCreacion = hoy) ──
+    if(sd(fc,today)){
+      if(!isCa)s.consH++;
+      if(isRe) s.reH++;
+      if(isCa) s.caH++;
     }
 
-    // ── Visitas programadas para hoy (FechaHora = hoy) ──
-    if(sd(fv,today)) s.todayL.push({h:fv,m:row['Motivo_Visita']||'—',e:est});
+    // ── Programadas hoy (FechaHora = hoy) ──
+    if(sd(fv,today))s.todayL.push({h:fv,m:row['Motivo_Visita']||'—',e:est});
   }
   for(const vl of['xio','lc'])S[vl].todayL.sort((a,b)=>(a.h||0)-(b.h||0));
   return S;
 }
 
-// Tasa cancelación = canceladas / agendadas
 function cRate(s){return s.ag>=3?s.ca/s.ag:null;}
+function calcBonus(s){const W=getW();const wi=getWi();let e=0;for(let i=0;i<=wi;i++){if((s.wRe[i]||0)>=BON_W)e+=W[i].b;}return e;}
 
-// Bono comisión: cuenta semanas donde realizadas >= BON_W_GOAL
-function calcBonus(s){const W=getW();const wi=getWi();let e=0;for(let i=0;i<=wi;i++){if((s.wRe[i]||0)>=BON_W_GOAL)e+=W[i].b;}return e;}
-
-// Conseguidas esta semana (operativo: FechaCreacion en días L-S de esta semana, no canceladas)
-function weeklyConseguidas(s){
-  const days=getWeekDays();
-  let total=0;
-  for(const d of days){total+=(s.dayConsMap[d.toDateString()]||0);}
-  return total;
-}
-
-// Conseguidas hoy para el bloque operativo
-function todayConseguidas(s){return s.consH;}
-
-// ── RENDER ─────────────────────────────────────────────
+// ── RENDER ────────────────────────────────────────────────────────────────────
 function renderAll(S){
   lastS=S;
   renderHeader();renderDateBar();
@@ -539,109 +542,102 @@ function renderAll(S){
 }
 
 function renderHeader(){
-  const b=document.getElementById('ubadge');b.className='ubadge '+cu;b.textContent='👤 '+VL_NAMES[cu];
+  const b=document.getElementById('ubadge');
+  b.className='ubadge '+cu;
+  b.textContent='👤 '+VL_NAMES[cu];
   document.getElementById('sw-btn').textContent='Ver '+(cu==='xio'?'Luis Carlos':'Xiomara');
 }
 
 function renderDateBar(){
   const t=new Date();
-  document.getElementById('dd').textContent=`${DIAS[t.getDay()]} ${t.getDate()} de ${MESES[t.getMonth()]}`;
+  document.getElementById('dd').textContent=DIAS[t.getDay()]+' '+t.getDate()+' de '+MESES[t.getMonth()];
   const wi=getWi();const W=getW();
-  document.getElementById('wd2').textContent=wi>=0?`${W[wi].l} (${W[wi].r})`:'';
+  document.getElementById('wd2').textContent=wi>=0?W[wi].l+' ('+W[wi].r+')':'';
   const last=getDIM();const left=last-t.getDate();
-  document.getElementById('dl').textContent=`${left} día${left!==1?'s':''} restante${left!==1?'s':''} en el mes`;
+  document.getElementById('dl').textContent=left+' día'+(left!==1?'s':'')+' restante'+(left!==1?'s':'')+' en el mes';
 }
 
 function renderOperativo(S){
   const s=S[cu];
   const today=new Date();
-  const dow=today.getDay(); // 0=Dom,1=Lun...6=Sáb
-
+  const dow=today.getDay();
   const rate=cRate(s);
 
-  // ── Objetivo HOY ──
-  const baseHoy=dailyTarget(dow); // 5 L-V, 3 Sáb, 0 Dom
+  // HOY
+  const baseHoy=dailyTarget(dow);
   const ajHoy=rate!==null&&baseHoy>0?Math.ceil(baseHoy/(1-rate)):baseHoy;
-  const consHoy=todayConseguidas(s); // conseguidas hoy (no canceladas)
+  const consHoy=s.consH;
 
-  // ── Semana operativa ──
-  const semCons=weeklyConseguidas(s);       // conseguidas esta semana (no canceladas)
+  if(dow===0){
+    document.getElementById('op-hoy-v').textContent='—';
+    document.getElementById('op-hoy-s').textContent='Domingo — descanso';
+    document.getElementById('oc-aj').className='oc';
+  } else {
+    document.getElementById('op-hoy-v').textContent=baseHoy;
+    document.getElementById('op-hoy-s').textContent=consHoy>=baseHoy?'✓ Ya tenés '+consHoy:'Llevas '+consHoy+' hoy';
+    document.getElementById('op-aj-v').textContent=ajHoy;
+    document.getElementById('op-aj-s').textContent=rate!==null?'tasa caída: '+(rate*100).toFixed(0)+'%':'sin datos aún';
+    document.getElementById('oc-aj').className='oc '+(rate!==null&&rate>0.15?'warn':'good');
+  }
+
+  // SEMANA
+  const semCons=s.semCons;
   const semFlt=Math.max(0,OP_WEEK-semCons);
-
   const weekDays=getWeekDays();
-  const remDays=weekDays.filter(d=>{
-    const dd=new Date(d); dd.setHours(23,59,59);
+  const remDays=weekDays.filter(function(d){
+    const dd=new Date(d);dd.setHours(23,59,59);
     return dd>today&&isWorkday(d.getDay());
   });
-  const ritmoSem=remDays.length>0?Math.ceil(semFlt/remDays.length):semFlt;
+  const ritmo=remDays.length>0?Math.ceil(semFlt/remDays.length):semFlt;
 
-  // ── Render cards ──
-  // Card 1: Conseguir HOY
-  if(dow===0){
-    document.getElementById('op-hoy').textContent='—';
-    document.getElementById('op-hoy').parentElement.querySelector('.oc-sub').textContent='Domingo — descanso';
-  } else {
-    document.getElementById('op-hoy').textContent=baseHoy;
-    document.getElementById('op-hoy').parentElement.querySelector('.oc-sub').textContent=
-      consHoy>=baseHoy?`✓ Ya tenés ${consHoy}`:`Llevas ${consHoy} hoy`;
-  }
-
-  // Card 2: Ajustado por caída
-  const ajCard=document.getElementById('op-hoy-card2');
-  if(dow===0){
-    document.getElementById('op-hoy-aj').textContent='—';
-    ajCard.className='op-card';
-  } else {
-    document.getElementById('op-hoy-aj').textContent=ajHoy;
-    ajCard.className=rate!==null&&rate>0.15?'op-card warn':'op-card good';
-    ajCard.querySelector('.oc-sub').textContent=rate!==null?`tasa caída: ${(rate*100).toFixed(0)}%`:'sin datos aún';
-  }
-
-  // Card 3: Van esta semana
-  document.getElementById('op-sem-re').textContent=semCons;
+  document.getElementById('op-sem-cons').textContent=semCons;
   document.getElementById('op-sem-obj').textContent=OP_WEEK;
+  document.getElementById('op-mes-cons').textContent=s.cons;
 
-  // Card 4: Faltan esta semana
   const fltEl=document.getElementById('op-sem-flt');
-  const subEl=document.getElementById('op-sem-sub');
-  const cardEl=document.getElementById('op-sem-card');
+  const fltS=document.getElementById('op-sem-flt-s');
+  const fltCard=document.getElementById('oc-flt');
   if(semFlt===0){
-    fltEl.textContent='✓ Listo';subEl.textContent='Semana operativa completa';
-    cardEl.className='op-card good';
+    fltEl.textContent='✓';fltS.textContent='Semana operativa ok';fltCard.className='oc good';
   } else {
     fltEl.textContent=semFlt;
-    subEl.textContent=remDays.length>0?`~${ritmoSem} por día hábil`:dow===0?'Mañana arranca':'¡Último día!';
-    cardEl.className='op-card warn';
+    fltS.textContent=remDays.length>0?'~'+ritmo+' por día hábil':(dow===0?'Mañana arranca':'¡Último día!');
+    fltCard.className='oc warn';
   }
 
-  // Card 5: Ritmo mensual
-  document.getElementById('op-mes-re').textContent=s.cons; // conseguidas mes (no canceladas)
-
-  // ── Tabla días de la semana ──
-  const dNames=['Lun','Mar','Mié','Jue','Vie','Sáb'];
-  document.getElementById('op-days').innerHTML=weekDays.map((d,i)=>{
+  // Tabla días L-S
+  document.getElementById('op-days').innerHTML=weekDays.map(function(d,i){
     const isToday=sd(d,today);
     const isPast=d<today&&!isToday;
     const ddow=d.getDay();
     const obj=dailyTarget(ddow);
-    const cons=s.dayConsMap[d.toDateString()]||0; // conseguidas ese día
-    const real=s.dayReMap[d.toDateString()]||0;   // realizadas ese día
+    const cons=s.dayConsMap[d.toDateString()]||0;
+    const real=s.dayReMap[d.toDateString()]||0;
     const ajD=rate!==null&&obj>0?Math.ceil(obj/(1-rate)):obj;
-    let cls='day-card';
-    if(isToday)cls+=' today';
-    else if(isPast)cls+=cons>=obj?' past-ok':' past-fail';
-    else cls+=' future';
+    let cls='dc';
+    if(isToday) cls+=' today';
+    else if(isPast) cls+=cons>=obj?' pok':' pfail';
+    else cls+=' fut';
     let sub='';
     if(obj===0) sub='Descanso';
-    else if(isToday) sub=`${cons} conseguidas · obj adj: ${ajD}`;
-    else if(isPast)  sub=`${cons} conseg · ${real} realiz`;
-    else             sub=`obj: ${obj} · aj: ${ajD}`;
-    return`<div class="\${cls}">
-      <div class="dc-day">\${dNames[i]} \${d.getDate()}</div>
-      <div class="dc-obj">\${obj>0?obj:'—'}</div>
-      <div class="dc-got">\${sub}</div>
-    </div>`;
+    else if(isToday) sub=cons+' conseg · obj adj: '+ajD;
+    else if(isPast)  sub=cons+' conseg · '+real+' realiz';
+    else             sub='obj: '+obj+' · aj: '+ajD;
+    return '<div class="'+cls+'"><div class="dc-d">'+DNAMES[i]+' '+d.getDate()+'</div><div class="dc-v">'+(obj>0?obj:'—')+'</div><div class="dc-s">'+sub+'</div></div>';
   }).join('');
+
+  // Desglose semanal ambos VL
+  ['xio','lc'].forEach(function(vl){
+    const sv=S[vl];
+    const pct=OP_WEEK>0?Math.min(sv.semCons/OP_WEEK*100,100):0;
+    const color=vl==='xio'?'var(--xio)':'var(--lc)';
+    document.getElementById('sem-'+vl).innerHTML=
+      '<div class="sem-name" style="color:'+color+'">'+VL_NAMES[vl]+'</div>'+
+      '<div class="sem-bar-wrap"><div class="sem-bar-fill" style="width:'+pct+'%;background:'+color+'"></div></div>'+
+      '<div class="sem-num" style="color:'+color+'">'+sv.semCons+'/'+OP_WEEK+'</div>'+
+      '<div class="sem-num" style="color:var(--green)">'+sv.semRe+'</div>'+
+      '<div class="sem-num" style="color:var(--orange)">'+sv.semPe+'</div>';
+  });
 }
 
 function renderComision(S){
@@ -654,47 +650,53 @@ function renderComision(S){
   document.getElementById('cm-re').textContent=s.re;
   document.getElementById('cm-flt').textContent=flt>0?flt:'✓ Llegaste!';
   document.getElementById('cm-rate').textContent=rate!==null?(rate*100).toFixed(1)+'%':'—';
-  document.getElementById('cm-bon').textContent=`Bs ${bon}`;
-  document.getElementById('cm-bon-s').textContent=bon>0?`Semanas completadas · máx Bs 2,000`:`Completá semanas de 20 visitas`;
+  document.getElementById('cm-bon').textContent='Bs '+bon;
+  document.getElementById('cm-bon-s').textContent=bon>0?'Semanas completadas · máx Bs 2,000':'Completá semanas de 20 realizadas';
 
-  document.getElementById('com-weeks').innerHTML=W.map((w,i)=>{
+  document.getElementById('com-weeks').innerHTML=W.map(function(w,i){
     const xW=S.xio.wRe[i]||0,lW=S.lc.wRe[i]||0;
-    const show=i<=wi;const xOk=xW>=BON_W_GOAL,lOk=lW>=BON_W_GOAL;
+    const show=i<=wi;
+    const xOk=xW>=BON_W,lOk=lW>=BON_W;
     const meOk=cu==='xio'?xOk:lOk;
-    let cls='cw';if(i===wi)cls+=' cur';else if(i<wi)cls+=meOk?' pok':' pfail';
+    let cls='cw';
+    if(i===wi)cls+=' cur';
+    else if(i<wi)cls+=meOk?' pok':' pfail';
     const ck='<span style="color:var(--green);font-size:11px;margin-left:2px">✓</span>';
     const xk='<span style="color:var(--red);font-size:11px;margin-left:2px">✗</span>';
-    return`<div class="${cls}">
-      <div class="cw-lbl">${w.l} · ${w.r}</div>
-      <div class="cw-bonus">🎁 Bs ${w.b}</div>
-      <div class="cw-row"><div class="cw-dot" style="background:var(--xio)"></div><div class="cw-name" style="color:var(--xio)">Xiomara</div><div class="cw-val" style="color:var(--xio)">${xW}</div><div class="cw-tgt">/${BON_W_GOAL}</div>${show?(xOk?ck:xk):''}</div>
-      <div class="cw-row"><div class="cw-dot" style="background:var(--lc)"></div><div class="cw-name" style="color:var(--lc)">Luis Carlos</div><div class="cw-val" style="color:var(--lc)">${lW}</div><div class="cw-tgt">/${BON_W_GOAL}</div>${show?(lOk?ck:xk):''}</div>
-    </div>`;
+    return '<div class="'+cls+'">'+
+      '<div class="cw-l">'+w.l+' · '+w.r+'</div>'+
+      '<div class="cw-b">🎁 Bs '+w.b+'</div>'+
+      '<div class="cw-row"><div class="cw-dot" style="background:var(--xio)"></div><div class="cw-name" style="color:var(--xio)">Xiomara</div><div class="cw-val" style="color:var(--xio)">'+xW+'</div><div class="cw-tgt">/'+BON_W+'</div>'+(show?(xOk?ck:xk):'')+' </div>'+
+      '<div class="cw-row"><div class="cw-dot" style="background:var(--lc)"></div><div class="cw-name" style="color:var(--lc)">Luis Carlos</div><div class="cw-val" style="color:var(--lc)">'+lW+'</div><div class="cw-tgt">/'+BON_W+'</div>'+(show?(lOk?ck:xk):'')+' </div>'+
+    '</div>';
   }).join('');
 }
 
 function renderCards(S){
   for(const vl of['xio','lc']){
     const s=S[vl];
-    const opPct=Math.min((s.cons/OP_MONTH)*100,100); // operativo: conseguidas (no canceladas)
-    const bnPct=Math.min((s.re/BON_GOAL)*100,100);   // bono: solo realizadas
+    const opPct=Math.min(s.cons/OP_MONTH*100,100);
+    const bnPct=Math.min(s.re/BON_GOAL*100,100);
     const r=cRate(s);const rs=r!==null?(r*100).toFixed(1)+'%':'n/d';
-    document.getElementById(`${vl}-re`).textContent=s.re;
-    document.getElementById(`${vl}-ag`).textContent=s.ag;
-    document.getElementById(`${vl}-ca`).textContent=s.ca;
-    document.getElementById(`${vl}-pe`).textContent=s.pe;
-    document.getElementById(`${vl}-ts`).textContent=rs;
-    document.getElementById(`${vl}-op-pct`).textContent=opPct.toFixed(1)+'%';
-    document.getElementById(`${vl}-bn-pct`).textContent=bnPct.toFixed(1)+'%';
-    setTimeout(()=>{
-      document.getElementById(`${vl}-op-bar`).style.width=opPct+'%';
-      document.getElementById(`${vl}-bn-bar`).style.width=bnPct+'%';
+    document.getElementById(vl+'-cons').textContent=s.cons;
+    document.getElementById(vl+'-re').textContent=s.re;
+    document.getElementById(vl+'-ca').textContent=s.ca;
+    document.getElementById(vl+'-pe').textContent=s.pe;
+    document.getElementById(vl+'-ts').textContent=rs;
+    document.getElementById(vl+'-op-pct').textContent=opPct.toFixed(1)+'%';
+    document.getElementById(vl+'-bn-pct').textContent=bnPct.toFixed(1)+'%';
+    setTimeout(function(){
+      document.getElementById(vl+'-op-bar').style.width=opPct+'%';
+      document.getElementById(vl+'-bn-bar').style.width=bnPct+'%';
     },120);
-    const badge=document.getElementById(`${vl}-cb`);
-    if(r!==null){const hi=r>0.25;badge.className='cbadge '+(hi?'warn':'ok');badge.textContent=hi?`⚠ ${rs} caída`:`✓ ${rs} caída`;}
-    else{badge.className='cbadge warn';badge.textContent='Pocos datos';}
+    const badge=document.getElementById(vl+'-cb');
+    if(r!==null){
+      const hi=r>0.25;
+      badge.className='cbadge '+(hi?'warn':'ok');
+      badge.textContent=hi?'⚠ '+rs+' caída':'✓ '+rs+' caída';
+    } else {badge.className='cbadge warn';badge.textContent='Pocos datos';}
   }
-  const xS=S.xio.re,lS=S.lc.re;
+  const xS=S.xio.cons,lS=S.lc.cons;
   document.getElementById('rk-xio').textContent=xS>=lS?'1':'2';
   document.getElementById('rk-lc').textContent=lS>xS?'1':'2';
   document.getElementById('card-xio').className='fc xio'+(cu==='xio'?' mine':'');
@@ -702,39 +704,86 @@ function renderCards(S){
 }
 
 function renderTodayDetail(S){
-  const ids={xio:['hx-ag','hx-re','hx-ca','hl-xio'],lc:['hl2-ag','hl2-re','hl2-ca','hl-lc']};
+  const data={
+    xio:{cons:'hx-cons',re:'hx-re',ca:'hx-ca',list:'hl-xio'},
+    lc: {cons:'hl2-cons',re:'hl2-re',ca:'hl2-ca',list:'hl-lc'}
+  };
   for(const vl of['xio','lc']){
-    const s=S[vl];const[ag,re,ca,lid]=ids[vl];
-    document.getElementById(ag).textContent=s.agH;
-    document.getElementById(re).textContent=s.reH;
-    document.getElementById(ca).textContent=s.caH;
-    const list=document.getElementById(lid);
+    const s=S[vl];const ids=data[vl];
+    document.getElementById(ids.cons).textContent=s.consH;
+    document.getElementById(ids.re).textContent=s.reH;
+    document.getElementById(ids.ca).textContent=s.caH;
+    const list=document.getElementById(ids.list);
     if(!s.todayL.length){list.innerHTML='<div class="empty">Sin visitas programadas para hoy</div>';}
-    else list.innerHTML=s.todayL.map(v=>{const h=v.h?v.h.toLocaleTimeString('es-BO',{hour:'2-digit',minute:'2-digit'}):'--:--';const e=v.e||'pendiente';return`<div class="hi"><div class="hd ${e}"></div><div class="ht">${h}</div><div class="hm">${v.m}</div><div class="he ${e}">${e}</div></div>`;}).join('');
+    else list.innerHTML=s.todayL.map(function(v){
+      const h=v.h?v.h.toLocaleTimeString('es-BO',{hour:'2-digit',minute:'2-digit'}):'--:--';
+      const e=v.e||'pendiente';
+      return '<div class="hi"><div class="hd '+e+'"></div><div class="ht2">'+h+'</div><div class="hm">'+v.m+'</div><div class="he '+e+'">'+e+'</div></div>';
+    }).join('');
   }
 }
 
 function renderLeads(S){
-  const u=[{n:'Xiomara',c:'var(--xio)',re:S.xio.re,cons:S.xio.cons,h:S.xio.agH},{n:'Luis Carlos',c:'var(--lc)',re:S.lc.re,cons:S.lc.cons,h:S.lc.agH}];
-  const byR=[...u].sort((a,b)=>b.re-a.re);const byH=[...u].sort((a,b)=>b.h-a.h);
-  document.getElementById('lv').innerHTML=byR.map((u,i)=>`<div class="lr"><div class="lpos${i===0?' f':''}">${i===0?'🥇':'🥈'}</div><div class="lnc"><div class="lname" style="color:${u.c}">${u.n}</div><div class="lsub">${((u.re/OP_MONTH)*100).toFixed(1)}% operativo · ${((u.re/BON_GOAL)*100).toFixed(1)}% bono</div></div><div class="lval" style="color:${u.c}">${u.re}</div></div>`).join('');
-  document.getElementById('lh').innerHTML=byH.map((u,i)=>`<div class="lr"><div class="lpos${i===0?' f':''}">${i===0?'🥇':'🥈'}</div><div class="lnc"><div class="lname" style="color:${u.c}">${u.n}</div><div class="lsub">agendadas hoy</div></div><div class="lval" style="color:${u.c}">${u.h}</div></div>`).join('');
+  const u=[
+    {n:'Xiomara',    c:'var(--xio)',cons:S.xio.cons,re:S.xio.re},
+    {n:'Luis Carlos',c:'var(--lc)', cons:S.lc.cons, re:S.lc.re}
+  ];
+  const byCons=[...u].sort(function(a,b){return b.cons-a.cons;});
+  const byRe=[...u].sort(function(a,b){return b.re-a.re;});
+  document.getElementById('lv').innerHTML=byCons.map(function(u,i){
+    return '<div class="lr"><div class="lpos'+(i===0?' f':'')+'">'+( i===0?'🥇':'🥈')+'</div>'+
+    '<div class="lnc"><div class="lname" style="color:'+u.c+'">'+u.n+'</div>'+
+    '<div class="lsub">'+((u.cons/OP_MONTH)*100).toFixed(1)+'% operativo</div></div>'+
+    '<div class="lval" style="color:'+u.c+'">'+u.cons+'</div></div>';
+  }).join('');
+  document.getElementById('lre').innerHTML=byRe.map(function(u,i){
+    return '<div class="lr"><div class="lpos'+(i===0?' f':'')+'">'+( i===0?'🥇':'🥈')+'</div>'+
+    '<div class="lnc"><div class="lname" style="color:'+u.c+'">'+u.n+'</div>'+
+    '<div class="lsub">'+((u.re/BON_GOAL)*100).toFixed(1)+'% del bono</div></div>'+
+    '<div class="lval" style="color:'+u.c+'">'+u.re+'</div></div>';
+  }).join('');
 }
 
 function switchUser(){cu=cu==='xio'?'lc':'xio';if(lastS)renderAll(lastS);}
 
+async function fetchV(){
+  const t=new Date(),y=t.getFullYear(),m=String(t.getMonth()+1).padStart(2,'0');
+  const q=encodeURIComponent('select * where C >= date \''+y+'-'+m+'-01\'');
+  const r=await fetch('https://docs.google.com/spreadsheets/d/'+SHEET_ID+'/gviz/tq?tqx=out:csv&sheet='+encodeURIComponent(SHEET_TAB)+'&tq='+q);
+  if(!r.ok)throw new Error('HTTP '+r.status);
+  return parseCSV(await r.text());
+}
+function parseCSV(csv){
+  const lines=csv.trim().split('\n');if(lines.length<2)return[];
+  const H=sl(lines[0]).map(function(h){return h.replace(/^"|"$/g,'').trim();});
+  return lines.slice(1).map(function(l){const v=sl(l),o={};H.forEach(function(h,i){o[h]=(v[i]||'').replace(/^"|"$/g,'').trim();});return o;});
+}
+function sl(l){const r=[];let c='',q=false;for(const ch of l){if(ch==='"'){q=!q;}else if(ch===','&&!q){r.push(c);c='';}else c+=ch;}r.push(c);return r;}
+
 async function fetchAndRender(){
   showL(true);hideErr();
-  try{const rows=await fetchV();renderAll(analyze(rows));toast('✓ Datos actualizados','ok');}
-  catch(e){console.error(e);showErr('Error: '+e.message);const em=()=>({re:0,ag:0,ca:0,pe:0,cons:0,agH:0,consH:0,reH:0,caH:0,wRe:[0,0,0,0],wCons:[0,0,0,0],todayL:[],dayConsMap:{},dayReMap:{}});renderAll({xio:em(),lc:em()});toast('⚠ Error','err');}
-  finally{showL(false);}
+  try{
+    const rows=await fetchV();
+    renderAll(analyze(rows));
+    toast('✓ Datos actualizados','ok');
+  }catch(e){
+    console.error(e);
+    showErr('Error cargando datos: '+e.message);
+    const em=function(){return{ag:0,cons:0,re:0,ca:0,pe:0,semCons:0,semRe:0,semPe:0,semCa:0,consH:0,reH:0,caH:0,dayConsMap:{},dayReMap:{},wRe:[0,0,0,0],todayL:[]};};
+    renderAll({xio:em(),lc:em()});
+    toast('⚠ Error al cargar','err');
+  }finally{showL(false);}
 }
-async function refreshData(){const b=document.getElementById('rf-btn');b.classList.add('spinning');await fetchAndRender();b.classList.remove('spinning');}
+async function refreshData(){
+  document.getElementById('rf-btn').textContent='↻ ...';
+  await fetchAndRender();
+  document.getElementById('rf-btn').textContent='↻ Actualizar';
+}
 function showL(v){document.getElementById('lo').classList.toggle('h',!v);document.getElementById('app').classList.toggle('v',!v);}
 function showErr(m){document.getElementById('err-m').textContent=m;document.getElementById('err-b').classList.add('v');}
 function hideErr(){document.getElementById('err-b').classList.remove('v');}
-function toast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className=`toast ${type} show`;setTimeout(()=>t.classList.remove('show'),3000);}
-window.addEventListener('DOMContentLoaded',()=>fetchAndRender());
+function toast(msg,type){const t=document.getElementById('toast');t.textContent=msg;t.className='toast '+type+' show';setTimeout(function(){t.classList.remove('show');},3000);}
+window.addEventListener('DOMContentLoaded',function(){fetchAndRender();});
 </script>
 </body>
 </html>
