@@ -213,22 +213,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 .kommo-error{text-align:center;padding:14px;color:#dc2626;font-size:11px;background:#fef2f2;border-radius:8px;}
 @media(max-width:768px){.kommo-grid{grid-template-columns:1fr;}}
 
-
-/* CHARTS */
-.chart-block{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:var(--sh);}
-.chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
-.chart-title{font-family:var(--fd);font-size:15px;font-weight:900;letter-spacing:1px;color:var(--text);}
-.chart-subtitle{font-size:11px;color:var(--text-dim);margin-top:2px;}
-.chart-tabs{display:flex;gap:6px;}
-.chart-tab{padding:5px 12px;border-radius:6px;border:1px solid var(--border);background:none;cursor:pointer;font-family:var(--fd);font-size:12px;font-weight:700;letter-spacing:1px;color:var(--text-dim);transition:all .2s;}
-.chart-tab.active{background:var(--blue);border-color:var(--blue);color:#fff;}
-.chart-legend{display:flex;gap:16px;align-items:center;flex-wrap:wrap;}
-.chart-legend-item{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;}
-.chart-legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
-.chart-wrap{position:relative;width:100%;overflow:hidden;}
-canvas.chart-canvas{width:100%!important;display:block;}
-.chart-empty{text-align:center;padding:40px;color:var(--muted);font-size:12px;}
-
 </style>
 </head>
 <body>
@@ -393,33 +377,6 @@ canvas.chart-canvas{width:100%!important;display:block;}
       </div>
     </div>
 
-
-
-    <!-- GRÁFICO HORARIO -->
-    <div class="stitle ani d3">Análisis horario — ¿cuándo conseguís visitas?</div>
-    <div class="chart-block ani d3">
-      <div class="chart-header">
-        <div>
-          <div class="chart-title">📈 Visitas conseguidas por hora del día</div>
-          <div class="chart-subtitle">Presupuesto · hora de FechaCreacion (momento en que se agendó)</div>
-        </div>
-        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-          <div class="chart-legend">
-            <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--xio)"></div>Xiomara</div>
-            <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--lc)"></div>Luis Carlos</div>
-          </div>
-          <div class="chart-tabs">
-            <button class="chart-tab active" onclick="setChartMode('hoy',this)">Hoy</button>
-            <button class="chart-tab" onclick="setChartMode('semana',this)">Semana</button>
-            <button class="chart-tab" onclick="setChartMode('mes',this)">Mes</button>
-          </div>
-        </div>
-      </div>
-      <div class="chart-wrap">
-        <canvas id="hora-chart" class="chart-canvas" height="220"></canvas>
-        <div class="chart-empty" id="chart-empty" style="display:none">Sin datos para este período</div>
-      </div>
-    </div>
 
     <!-- KOMMO PIPELINE -->
     <div class="stitle ani d4">Pipeline de Kommo — Leads activos</div>
@@ -1171,194 +1128,12 @@ async function renderKommo(){
 }
 
 
-// ── CHARTS ────────────────────────────────────────────────────────
-let chartMode = 'hoy';
-let chartInstance = null;
-let lastChartData = null;
-
-const HOURS = [7,8,9,10,11,12,13,14,15,16,17,18,19,20];
-const HOUR_LABELS = HOURS.map(h => h<=12?(h+'am'):(h===12?'12pm':((h-12)+'pm')));
-
-function setChartMode(mode, btn){
-  chartMode = mode;
-  document.querySelectorAll('.chart-tab').forEach(b => b.classList.remove('active'));
-  if(btn) btn.classList.add('active');
-  if(window._lastRows) renderHourChart(window._lastRows);
-}
-
-function buildHourData(rows, mode){
-  const today = new Date();
-  const monday = getMondayOfWeek(today);
-  const saturday = new Date(monday); saturday.setDate(monday.getDate()+5); saturday.setHours(23,59,59);
-
-  // xio/lc counts per hour slot
-  const xio = Array(HOURS.length).fill(0);
-  const lc  = Array(HOURS.length).fill(0);
-
-  for(const row of rows){
-    const vl = rvl(row['Creador_Visita']) || rvl(row['Modificador_Visita']);
-    if(!vl) continue;
-    const mot = (row['Motivo_Visita']||'').toLowerCase().trim();
-    if(mot !== 'presupuesto') continue;
-    const est = (row['Estado_Visita']||'').toLowerCase().trim();
-    if(est === 'cancelada') continue;
-
-    // FechaCreacion tiene hora exacta del momento que se consiguió
-    const fc = pdt(row['FechaCreacion_Visita']);
-    if(!fc) continue;
-
-    let include = false;
-    if(mode === 'hoy')    include = sd(fc, today);
-    else if(mode === 'semana') include = fc >= monday && fc <= saturday;
-    else if(mode === 'mes')   include = sm(fc, today);
-
-    if(!include) continue;
-
-    const h = fc.getHours();
-    const idx = HOURS.indexOf(h);
-    if(idx < 0) continue; // fuera del rango 7-20
-
-    if(vl === 'xio') xio[idx]++;
-    else              lc[idx]++;
-  }
-  return {xio, lc};
-}
-
-function renderHourChart(rows){
-  lastChartData = rows;
-  const {xio, lc} = buildHourData(rows, chartMode);
-  const total = xio.reduce((a,b)=>a+b,0) + lc.reduce((a,b)=>a+b,0);
-
-  const emptyEl = document.getElementById('chart-empty');
-  const canvas  = document.getElementById('hora-chart');
-  if(!canvas) return;
-
-  if(total === 0){
-    canvas.style.display = 'none';
-    emptyEl.style.display = 'block';
-    return;
-  }
-  canvas.style.display = 'block';
-  emptyEl.style.display = 'none';
-
-  // Canvas 2D chart (no external lib needed)
-  const dpr = window.devicePixelRatio || 1;
-  const W = canvas.parentElement.offsetWidth;
-  const H = 220;
-  canvas.width  = W * dpr;
-  canvas.height = H * dpr;
-  canvas.style.width  = W + 'px';
-  canvas.style.height = H + 'px';
-
-  const ctx = canvas.getContext('2d');
-  ctx.scale(dpr, dpr);
-  ctx.clearRect(0,0,W,H);
-
-  const PAD = {top:20, right:20, bottom:44, left:36};
-  const gW = W - PAD.left - PAD.right;
-  const gH = H - PAD.top  - PAD.bottom;
-  const maxVal = Math.max(...xio, ...lc, 1);
-  const n = HOURS.length;
-  const step = gW / (n-1);
-
-  // Grid lines
-  ctx.strokeStyle = '#e2e6ef';
-  ctx.lineWidth = 1;
-  const gridLines = 4;
-  for(let i=0;i<=gridLines;i++){
-    const y = PAD.top + gH - (i/gridLines)*gH;
-    ctx.beginPath(); ctx.moveTo(PAD.left,y); ctx.lineTo(PAD.left+gW,y); ctx.stroke();
-    ctx.fillStyle = '#94a3b8';
-    ctx.font = '10px Barlow, sans-serif';
-    ctx.textAlign = 'right';
-    ctx.fillText(Math.round((i/gridLines)*maxVal), PAD.left-4, y+3);
-  }
-
-  // X labels
-  ctx.fillStyle = '#94a3b8';
-  ctx.font = '10px Barlow, sans-serif';
-  ctx.textAlign = 'center';
-  HOUR_LABELS.forEach(function(lbl,i){
-    const x = PAD.left + i*step;
-    ctx.fillText(lbl, x, H-PAD.bottom+14);
-  });
-
-  function drawLine(data, color, fillColor){
-    // Area fill
-    ctx.beginPath();
-    ctx.moveTo(PAD.left, PAD.top+gH);
-    data.forEach(function(v,i){
-      const x = PAD.left + i*step;
-      const y = PAD.top + gH - (v/maxVal)*gH;
-      if(i===0) ctx.lineTo(x,y); else ctx.lineTo(x,y);
-    });
-    ctx.lineTo(PAD.left+(n-1)*step, PAD.top+gH);
-    ctx.closePath();
-    ctx.fillStyle = fillColor;
-    ctx.fill();
-
-    // Line
-    ctx.beginPath();
-    data.forEach(function(v,i){
-      const x = PAD.left + i*step;
-      const y = PAD.top + gH - (v/maxVal)*gH;
-      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
-    });
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2.5;
-    ctx.lineJoin = 'round';
-    ctx.stroke();
-
-    // Dots + labels
-    data.forEach(function(v,i){
-      if(v===0) return;
-      const x = PAD.left + i*step;
-      const y = PAD.top + gH - (v/maxVal)*gH;
-      ctx.beginPath();
-      ctx.arc(x,y,4,0,Math.PI*2);
-      ctx.fillStyle = color;
-      ctx.fill();
-      ctx.fillStyle = color;
-      ctx.font = 'bold 11px Barlow Condensed, sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(v, x, y-8);
-    });
-  }
-
-  // VL visibility based on profile
-  if(currentProfile === 'admin' || currentProfile === 'xio'){
-    drawLine(xio, '#0099cc', 'rgba(0,153,204,0.07)');
-  }
-  if(currentProfile === 'admin' || currentProfile === 'lc'){
-    drawLine(lc,  '#e05a1a', 'rgba(224,90,26,0.07)');
-  }
-
-  // Peak hour annotation
-  const allTotals = HOURS.map((_,i)=>(xio[i]||0)+(lc[i]||0));
-  const peakIdx = allTotals.indexOf(Math.max(...allTotals));
-  if(allTotals[peakIdx]>0){
-    const px = PAD.left + peakIdx*step;
-    ctx.strokeStyle = 'rgba(245,200,66,0.5)';
-    ctx.lineWidth = 1;
-    ctx.setLineDash([4,3]);
-    ctx.beginPath(); ctx.moveTo(px,PAD.top); ctx.lineTo(px,PAD.top+gH); ctx.stroke();
-    ctx.setLineDash([]);
-    ctx.fillStyle = '#b8860b';
-    ctx.font = 'bold 10px Barlow Condensed, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('PICO', px, PAD.top-4);
-  }
-}
-
-
 async function fetchAndRender(){
   showL(true);hideErr();
   try{
     const rows=await fetchV();
     renderAll(analyze(rows));
-    window._lastRows=rows;
     toast('✓ Datos actualizados','ok');
-    renderHourChart(rows);
     renderKommo();
   }catch(e){
     console.error(e);
