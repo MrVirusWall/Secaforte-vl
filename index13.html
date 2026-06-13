@@ -229,30 +229,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 canvas.chart-canvas{width:100%!important;display:block;}
 .chart-empty{text-align:center;padding:40px;color:var(--muted);font-size:12px;}
 
-
-/* CONVERSION KPI */
-.conv-block{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:var(--sh);}
-.conv-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-.conv-card{border-radius:12px;padding:18px;border:1px solid var(--border);background:var(--bg);position:relative;overflow:hidden;}
-.conv-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
-.conv-card.xio::before{background:var(--xio);}
-.conv-card.lc::before{background:var(--lc);}
-.conv-card-title{font-family:var(--fd);font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;}
-.conv-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;}
-.conv-stat{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:10px 12px;text-align:center;}
-.conv-stat-l{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
-.conv-stat-v{font-family:var(--fd);font-size:28px;font-weight:900;line-height:1;}
-.conv-rate-wrap{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;align-items:center;gap:12px;}
-.conv-rate-circle{width:56px;height:56px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-family:var(--fd);font-size:16px;font-weight:900;border:3px solid;}
-.conv-rate-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
-.conv-rate-desc{font-size:12px;color:var(--text-dim);}
-.conv-bar-wrap{margin-top:10px;}
-.conv-bar-label{display:flex;justify-content:space-between;font-size:10px;color:var(--text-dim);margin-bottom:4px;font-family:var(--fd);}
-.conv-bar-track{height:8px;background:var(--border);border-radius:99px;overflow:hidden;}
-.conv-bar-fill{height:100%;border-radius:99px;transition:width 1s cubic-bezier(.34,1.56,.64,1);}
-.conv-loading{text-align:center;padding:20px;color:var(--muted);font-size:11px;letter-spacing:2px;text-transform:uppercase;}
-@media(max-width:768px){.conv-grid{grid-template-columns:1fr;}}
-
 </style>
 </head>
 <body>
@@ -418,23 +394,6 @@ canvas.chart-canvas{width:100%!important;display:block;}
     </div>
 
 
-
-
-    <!-- CONVERSIÓN LEADS → VISITAS -->
-    <div class="stitle ani d2">Conversión del día — Leads recibidos vs Visitas conseguidas</div>
-    <div class="conv-block ani d2">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;">
-        <div style="font-size:22px">⚡</div>
-        <div>
-          <div style="font-family:var(--fd);font-size:16px;font-weight:900;letter-spacing:1px;">LEADS HOY → VISITAS HOY</div>
-          <div style="font-size:11px;color:var(--text-dim);margin-top:2px;">Leads asignados hoy en Kommo · Visitas Presupuesto conseguidas hoy en AppSheet</div>
-        </div>
-        <div style="margin-left:auto;font-size:10px;color:var(--muted);" id="conv-updated">Actualizando...</div>
-      </div>
-      <div class="conv-grid" id="conv-grid">
-        <div class="conv-loading">Cargando datos de Kommo...</div>
-      </div>
-    </div>
 
     <!-- GRÁFICO HORARIO -->
     <div class="stitle ani d3">Análisis horario — ¿cuándo conseguís visitas?</div>
@@ -1212,97 +1171,6 @@ async function renderKommo(){
 }
 
 
-// ── CONVERSION KPI ────────────────────────────────────────────────
-async function renderConversionKPI(S){
-  const grid = document.getElementById('conv-grid');
-  if(!grid) return;
-
-  // Fetch KommoHoy sheet
-  let kommoHoy = {xio: null, lc: null};
-  try{
-    const url = 'https://docs.google.com/spreadsheets/d/'+SHEET_ID_KOMMO+'/gviz/tq?tqx=out:csv&sheet=KommoHoy';
-    const r = await fetch(url);
-    if(r.ok){
-      const csv = await r.text();
-      const lines = csv.trim().split('\n').slice(1);
-      lines.forEach(function(l){
-        const v = l.split(',').map(function(s){return s.replace(/^"|"$/g,'').trim();});
-        const name = v[0]; const count = parseInt(v[1])||0; const upd = v[2]||'';
-        if(name==='Xiomara')     { kommoHoy.xio=count; }
-        if(name==='Luis Carlos') { kommoHoy.lc=count;  }
-        if(upd) document.getElementById('conv-updated').textContent='Kommo actualizado: '+upd;
-      });
-    }
-  }catch(e){ console.warn('KommoHoy fetch error:', e); }
-
-  const vlsToShow = currentProfile==='admin'?['xio','lc']:[currentProfile];
-
-  if(SHEET_ID_KOMMO === 'REEMPLAZAR_CON_ID_DEL_SHEET' || kommoHoy.xio===null){
-    grid.innerHTML = '<div class="conv-loading" style="grid-column:1/-1">⏳ Esperando datos de Kommo — corré el script primero</div>';
-    return;
-  }
-
-  grid.style.gridTemplateColumns = currentProfile!=='admin'?'1fr':'1fr 1fr';
-
-  let html = '';
-  for(const vl of vlsToShow){
-    const color     = vl==='xio'?'var(--xio)':'var(--lc)';
-    const s         = S[vl];
-    const leadsHoy  = kommoHoy[vl] !== null ? kommoHoy[vl] : 0;
-    const visitasHoy= s.consH; // conseguidas hoy (no canceladas)
-    const tasa      = leadsHoy > 0 ? Math.round(visitasHoy/leadsHoy*100) : 0;
-
-    // Color de la tasa
-    let tasaColor, tasaBg;
-    if(tasa >= 30)     { tasaColor=color;              tasaBg='rgba(22,163,74,0.08)'; }
-    else if(tasa >= 15){ tasaColor='var(--orange)';    tasaBg='rgba(234,88,12,0.08)'; }
-    else               { tasaColor='var(--red)';       tasaBg='rgba(220,38,38,0.08)'; }
-
-    const tasPct = Math.min(tasa, 100);
-
-    html += '<div class="conv-card '+vl+'">'+
-      '<div class="conv-card-title" style="color:'+color+'">'+VL_NAMES[vl]+'</div>'+
-      '<div class="conv-row">'+
-        '<div class="conv-stat">'+
-          '<div class="conv-stat-l">Leads hoy</div>'+
-          '<div class="conv-stat-v" style="color:'+color+'">'+leadsHoy+'</div>'+
-          '<div style="font-size:10px;color:var(--text-dim);margin-top:2px">recibidos</div>'+
-        '</div>'+
-        '<div class="conv-stat" style="background:rgba(94,234,212,0.05)">'+
-          '<div class="conv-stat-l">Visitas hoy</div>'+
-          '<div class="conv-stat-v" style="color:var(--green)">'+visitasHoy+'</div>'+
-          '<div style="font-size:10px;color:var(--text-dim);margin-top:2px">conseguidas</div>'+
-        '</div>'+
-        '<div class="conv-stat" style="background:'+tasaBg+'">'+
-          '<div class="conv-stat-l">Tasa</div>'+
-          '<div class="conv-stat-v" style="color:'+tasaColor+'">'+tasa+'%</div>'+
-          '<div style="font-size:10px;color:var(--text-dim);margin-top:2px">conversión</div>'+
-        '</div>'+
-      '</div>'+
-      '<div class="conv-bar-wrap">'+
-        '<div class="conv-bar-label"><span>Leads → Visitas</span><span style="color:'+tasaColor+'">'+visitasHoy+'/'+leadsHoy+'</span></div>'+
-        '<div class="conv-bar-track"><div class="conv-bar-fill" style="width:'+tasPct+'%;background:'+color+'"></div></div>'+
-      '</div>'+
-      '<div style="font-size:10px;color:var(--text-dim);margin-top:10px">'+
-        (leadsHoy===0?'⏳ Sin leads asignados hoy aún':
-         tasa>=30?'✅ Buena conversión — seguí así':
-         tasa>=15?'⚠️ Conversión media — hay margen de mejora':
-         visitasHoy===0?'🔴 Sin visitas conseguidas de leads de hoy':
-         '📊 Conversión baja — revisá el seguimiento')+
-      '</div>'+
-    '</div>';
-  }
-  grid.innerHTML = html;
-
-  // Animate bars
-  setTimeout(function(){
-    document.querySelectorAll('.conv-bar-fill').forEach(function(el){
-      el.style.width = el.style.width; // trigger reflow already set
-    });
-  }, 100);
-}
-
-
 // ── CHARTS ────────────────────────────────────────────────────────
 let chartMode = 'hoy';
 let chartInstance = null;
@@ -1491,7 +1359,6 @@ async function fetchAndRender(){
     window._lastRows=rows;
     toast('✓ Datos actualizados','ok');
     renderHourChart(rows);
-    renderConversionKPI(analyze(rows));
     renderKommo();
   }catch(e){
     console.error(e);
