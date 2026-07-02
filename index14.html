@@ -261,7 +261,7 @@ canvas.chart-canvas{width:100%!important;display:block;}
   <div class="hdr">
     <div class="hdr-brand">SECAFORTE <span>· ARENA VL</span></div>
     <div class="hdr-r">
-      <button class="btn" id="sw-btn" onclick="switchUser()" style="display:none">-</button>
+      <button class="btn" id="sw-btn" onclick="switchUser()">Ver Luis Carlos</button>
       <button class="btn" id="rf-btn" onclick="refreshData()">↻ Actualizar</button>
       <div class="ubadge" id="ubadge"></div>
       <button class="btn" id="logout-btn" onclick="doLogout()" style="display:none;color:#dc2626;border-color:#fecaca;">Salir</button>
@@ -407,7 +407,7 @@ canvas.chart-canvas{width:100%!important;display:block;}
         </div>
         <div class="hl" id="hl-xio"></div>
       </div>
-      <div class="hc" style="display:none"><div class="hc-t" style="color:var(--lc)">Luis Carlos</div>
+      <div class="hc"><div class="hc-t" style="color:var(--lc)">Luis Carlos</div>
         <div class="hs">
           <div class="hst"><div class="hst-l">Conseguidas hoy</div><div class="hst-v" id="hl2-cons">0</div></div>
           <div class="hst"><div class="hst-l">Realizadas hoy</div><div class="hst-v" style="color:var(--green)" id="hl2-re">0</div></div>
@@ -447,7 +447,7 @@ canvas.chart-canvas{width:100%!important;display:block;}
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
           <div class="chart-legend">
             <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--xio)"></div>Xiomara</div>
-
+            <div class="chart-legend-item"><div class="chart-legend-dot" style="background:var(--lc)"></div>Luis Carlos</div>
           </div>
           <div class="chart-tabs">
             <button class="chart-tab active" onclick="setChartMode('hoy',this)">Hoy</button>
@@ -497,14 +497,14 @@ const WBS={
   30:[{l:'Sem 1',r:'1–7', d:[1,7], b:200},{l:'Sem 2',r:'8–15', d:[8,15], b:400},{l:'Sem 3',r:'16–22',d:[16,22],b:500},{l:'Sem 4',r:'23–30',d:[23,30],b:800}],
   31:[{l:'Sem 1',r:'1–8', d:[1,8], b:200},{l:'Sem 2',r:'9–16', d:[9,16], b:400},{l:'Sem 3',r:'17–23',d:[17,23],b:500},{l:'Sem 4',r:'24–31',d:[24,31],b:800}],
 };
-const VL_MAP={'pirkavlocal@gmail.com':'xio','us0002':'xio'};
-const VL_NAMES={xio:'Xiomara'};
+const VL_MAP={'pirkavlocal@gmail.com':'xio','info@pirkastone.com.bo':'lc','us0002':'xio','us0003':'lc'};
+const VL_NAMES={xio:'Xiomara',lc:'Luis Carlos'};
 const DIAS=['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
 const MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 const DNAMES=['Lun','Mar','Mié','Jue','Vie','Sáb'];
 
 // ── PINS (cambiar antes de distribuir) ──
-const PINS={xio:'9346',admin:'3993'};
+const PINS={xio:'9346',lc:'8765',admin:'3993'};
 let cu='xio', lastS=null, currentProfile=null; // profile: 'xio','lc','admin'
 
 // ── LOGIN ──
@@ -690,7 +690,7 @@ function analyze(rows){
     // ── Programadas hoy (FechaHora = hoy) ──
     if(sd(fv,today))s.todayL.push({h:fv,m:row['Motivo_Visita']||'—',e:est});
   }
-  S['xio'].todayL.sort((a,b)=>(a.h||0)-(b.h||0));
+  for(const vl of['xio','lc'])S[vl].todayL.sort((a,b)=>(a.h||0)-(b.h||0));
   return S;
 }
 
@@ -757,11 +757,16 @@ function renderHeader(){
   // Badge muestra el perfil logueado, no el que se está viendo
   const profileLabel=currentProfile==='admin'?'Admin':VL_NAMES[currentProfile||cu];
   const profileColor=currentProfile==='lc'?'lc':(currentProfile==='admin'?'admin':currentProfile||'xio');
-  b.className='ubadge xio';
+  b.className='ubadge '+(currentProfile==='admin'?'xio':currentProfile||cu);
   b.textContent='👤 '+profileLabel+(currentProfile==='admin'?' (Admin)':'');
   // Switch solo para admin
   const swBtn=document.getElementById('sw-btn');
-  swBtn.style.display='none'; // Solo un VL activo
+  if(currentProfile==='admin'){
+    swBtn.style.display='';
+    swBtn.textContent='Ver '+(cu==='xio'?'Luis Carlos':'Xiomara');
+  } else {
+    swBtn.style.display='none';
+  }
   // Botón logout
   document.getElementById('logout-btn').style.display='';
 }
@@ -876,10 +881,11 @@ function renderOperativo(S){
   }).join('');
 
   // Desglose semanal ambos VL
-  ['xio'].forEach(function(vl){
+  ['xio','lc'].forEach(function(vl){
     const semRow=document.getElementById('sem-'+vl);
-    if(vl!=='xio'){ semRow.style.display='none'; return; }
-    semRow.style.display='';
+    if(currentProfile!=='admin'&&currentProfile!==vl){
+      semRow.style.display='none'; return;
+    } else { semRow.style.display=''; }
     const sv=S[vl];
     const pct=OP_WEEK>0?Math.min(sv.semCons/OP_WEEK*100,100):0;
     const color=vl==='xio'?'var(--xio)':'var(--lc)';
@@ -942,7 +948,7 @@ function renderComision(S){
         (xd.show?(xd.llego?ck:xk):'')+
         '<span style="font-size:9px;color:var(--text-dim);margin-left:4px">'+xBonTxt+'</span>'+
       '</div>':'')+
-      (false?
+      (showBothVL||currentProfile==='lc'?
         '<div class="cw-row"><div class="cw-dot" style="background:var(--lc)"></div>'+
         '<div class="cw-name" style="color:var(--lc)">Luis Carlos</div>'+
         '<div class="cw-val" style="color:var(--lc)">'+lW+'/'+BON_W+'</div>'+
@@ -956,7 +962,7 @@ function renderComision(S){
 function renderCards(S){
   // VL solo ven su propia card; admin ve ambas
   if(currentProfile!=='admin'){
-    const other='lc'; // LC inactivo
+    const other=currentProfile==='xio'?'lc':'xio';
     document.getElementById('card-'+other).style.display='none';
     document.getElementById('card-'+currentProfile).style.display='';
     document.querySelector('.vs-c').style.display='none';
@@ -966,7 +972,7 @@ function renderCards(S){
     const vsc=document.querySelector('.vs-c');
     if(vsc)vsc.style.display='';
   }
-  for(const vl of['xio']){
+  for(const vl of['xio','lc']){
     const s=S[vl];
     const opPct=Math.min(s.cons/OP_MONTH*100,100);
     const bnPct=Math.min(s.re/BON_GOAL*100,100);
@@ -993,7 +999,7 @@ function renderCards(S){
   document.getElementById('rk-xio').textContent=xS>=lS?'1':'2';
   document.getElementById('rk-lc').textContent=lS>xS?'1':'2';
   document.getElementById('card-xio').className='fc xio'+(cu==='xio'?' mine':'');
-  document.getElementById('card-lc').style.display='none';
+  document.getElementById('card-lc').className='fc lc'+(cu==='lc'?' mine':'');
 }
 
 function renderTodayDetail(S){
@@ -1004,9 +1010,14 @@ function renderTodayDetail(S){
   // VL solo ven su card de hoy
   const hoyXio=document.getElementById('hl-xio').closest('.hc');
   const hoyLc=document.getElementById('hl-lc').closest('.hc');
-  if(hoyXio)hoyXio.style.display='';
-  if(hoyLc)hoyLc.style.display='none';
-  for(const vl of['xio']){
+  if(currentProfile!=='admin'){
+    if(hoyXio)hoyXio.style.display=currentProfile==='xio'?'':'none';
+    if(hoyLc)hoyLc.style.display=currentProfile==='lc'?'':'none';
+  } else {
+    if(hoyXio)hoyXio.style.display='';
+    if(hoyLc)hoyLc.style.display='';
+  }
+  for(const vl of['xio','lc']){
     const s=S[vl];const ids=data[vl];
     document.getElementById(ids.cons).textContent=s.consH;
     document.getElementById(ids.re).textContent=s.reH;
@@ -1028,7 +1039,8 @@ function renderLeads(S){
   if(leadsSection)leadsSection.style.display='';
   if(leadTitle)leadTitle.style.display='';
   const u=[
-    {n:'Xiomara', key:'xio', c:'var(--xio)',cons:S.xio.cons,re:S.xio.re}
+    {n:'Xiomara',    key:'xio', c:'var(--xio)',cons:S.xio.cons,re:S.xio.re},
+    {n:'Luis Carlos',key:'lc',  c:'var(--lc)', cons:S.lc.cons, re:S.lc.re}
   ];
   const byCons=[...u].sort(function(a,b){return b.cons-a.cons;});
   const byRe=[...u].sort(function(a,b){return b.re-a.re;});
@@ -1053,7 +1065,11 @@ function renderLeads(S){
   }).join('');
 }
 
-function switchUser(){ /* Solo Xiomara activa */ }
+function switchUser(){
+  if(currentProfile!=='admin')return; // solo admin puede cambiar vista
+  cu=cu==='xio'?'lc':'xio';
+  if(lastS)renderAll(lastS);
+}
 
 async function fetchV(){
   const t=new Date(),y=t.getFullYear(),m=String(t.getMonth()+1).padStart(2,'0');
@@ -1093,6 +1109,7 @@ async function kommoFetch(path){
 async function loadKommoUsers(){
   // IDs fijos obtenidos de /api/v4/users
   kommoUserIds.xio = 8479184; // Xiomara - pirkavlocal@gmail.com
+  kommoUserIds.lc  = 7533869; // Luis Carlos - kommo@pirkastone.com.bo
 }
 
 async function loadKommoPipeline(){
@@ -1166,7 +1183,7 @@ async function renderKommo(){
       return {name:v[0],xio:parseInt(v[1])||0,lc:parseInt(v[2])||0};
     }).filter(function(r){return r.name&&r.name!=='Sin datos';});
     const lastUpdate=(lines[1].split(',')[4]||'').replace(/^"|"$/g,'');
-    const vlsToShow=['xio'];
+    const vlsToShow=currentProfile==='admin'?['xio','lc']:[currentProfile];
     let html='';
     for(const vl of vlsToShow){
       const color=vl==='xio'?'var(--xio)':'var(--lc)';
@@ -1187,7 +1204,7 @@ async function renderKommo(){
         '<div class="pipeline-stages">'+stageRows+'</div>'+
       '</div>';
     }
-    grid.style.gridTemplateColumns='1fr';
+    grid.style.gridTemplateColumns=currentProfile!=='admin'?'1fr':'1fr 1fr';
     grid.innerHTML=html;
   }catch(e){
     grid.innerHTML='<div class="kommo-error">Error: '+e.message+'</div>';
@@ -1212,20 +1229,20 @@ async function renderConversionKPI(S){
         const v = l.split(',').map(function(s){return s.replace(/^"|"$/g,'').trim();});
         const name = v[0]; const count = parseInt(v[1])||0; const upd = v[2]||'';
         if(name==='Xiomara')     { kommoHoy.xio=count; }
-        // Luis Carlos inactivo
+        if(name==='Luis Carlos') { kommoHoy.lc=count;  }
         if(upd) document.getElementById('conv-updated').textContent='Kommo actualizado: '+upd;
       });
     }
   }catch(e){ console.warn('KommoHoy fetch error:', e); }
 
-  const vlsToShow = ['xio']; // Solo Xiomara
+  const vlsToShow = currentProfile==='admin'?['xio','lc']:[currentProfile];
 
   if(SHEET_ID_KOMMO === 'REEMPLAZAR_CON_ID_DEL_SHEET' || kommoHoy.xio===null){
     grid.innerHTML = '<div class="conv-loading" style="grid-column:1/-1">⏳ Esperando datos de Kommo — corré el script primero</div>';
     return;
   }
 
-  grid.style.gridTemplateColumns = '1fr';
+  grid.style.gridTemplateColumns = currentProfile!=='admin'?'1fr':'1fr 1fr';
 
   let html = '';
   for(const vl of vlsToShow){
@@ -1441,7 +1458,12 @@ function renderHourChart(rows){
   }
 
   // VL visibility based on profile
-  drawLine(xio, '#0099cc', 'rgba(0,153,204,0.07)');
+  if(currentProfile === 'admin' || currentProfile === 'xio'){
+    drawLine(xio, '#0099cc', 'rgba(0,153,204,0.07)');
+  }
+  if(currentProfile === 'admin' || currentProfile === 'lc'){
+    drawLine(lc,  '#e05a1a', 'rgba(224,90,26,0.07)');
+  }
 
   // Peak hour annotation
   const allTotals = HOURS.map((_,i)=>(xio[i]||0)+(lc[i]||0));
@@ -1518,7 +1540,10 @@ window.addEventListener('DOMContentLoaded',function(){
           <div style="width:28px;height:28px;border-radius:50%;background:rgba(0,153,204,0.15);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;">X</div>
           Xiomara <span style="margin-left:auto;font-size:10px;opacity:0.5;letter-spacing:2px;">VL</span>
         </button>
-
+        <button onclick="selectProfile('lc')" style="padding:12px 16px;border-radius:10px;border:1.5px solid #e05a1a;background:rgba(224,90,26,0.08);color:#e05a1a;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .2s;">
+          <div style="width:28px;height:28px;border-radius:50%;background:rgba(224,90,26,0.15);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;">LC</div>
+          Luis Carlos <span style="margin-left:auto;font-size:10px;opacity:0.5;letter-spacing:2px;">VL</span>
+        </button>
         <button onclick="selectProfile('admin')" style="padding:12px 16px;border-radius:10px;border:1.5px solid #e2e6ef;background:#f7f8fc;color:#64748b;font-family:'Barlow Condensed',sans-serif;font-size:17px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .2s;">
           <div style="width:28px;height:28px;border-radius:50%;background:#e2e6ef;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;">A</div>
           Admin <span style="margin-left:auto;font-size:10px;opacity:0.5;letter-spacing:2px;">GERENCIA</span>
